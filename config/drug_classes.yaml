@@ -1,0 +1,180 @@
+# Single source of truth for what is "in scope".
+#
+# Every puller (ClinicalTrials.gov, openFDA, CMS Part D) reads this file, so adding
+# a molecule here adds it everywhere. Approval status is deliberately NOT stored
+# here: it comes from openFDA, so the config never goes stale.
+#
+# Fields
+#   class id        : short snake_case key used in every table
+#   label           : human-readable class name for the dashboard
+#   mechanism       : one-line mechanism of action
+#   area            : t2d | obesity | both  (primary market the class competes in)
+#   generation      : legacy | newer  (used in M4 for the "newer-agent uptake" feature)
+#   molecules       : list of
+#       generic     : INN / USAN name (lower case)
+#       brands      : US brand names (empty for pipeline assets)
+#       route       : sc | oral | iv | inhaled
+#       sponsor     : originator / lead sponsor
+#       aliases     : code names and alternate spellings used in trial registries
+#
+# CMS Part D generic-name strings (e.g. "Insulin Glargine,Hum.Rec.Anlog") differ from
+# INN names. The exact mapping is built and checked in Milestone 2, not guessed here.
+
+classes:
+  glp1_injectable:
+    label: GLP-1 receptor agonist (injectable)
+    mechanism: GLP-1 receptor agonism; glucose-dependent insulin secretion, slowed gastric emptying, appetite suppression
+    area: both
+    generation: newer
+    molecules:
+      - {generic: semaglutide, brands: [Ozempic, Wegovy], route: sc, sponsor: Novo Nordisk, aliases: [NN9535, NN9536]}
+      - {generic: liraglutide, brands: [Victoza, Saxenda], route: sc, sponsor: Novo Nordisk, aliases: [NN2211]}
+      - {generic: dulaglutide, brands: [Trulicity], route: sc, sponsor: Eli Lilly, aliases: [LY2189265]}
+      - {generic: exenatide, brands: [Byetta, Bydureon BCise], route: sc, sponsor: AstraZeneca, aliases: []}
+      - {generic: lixisenatide, brands: [Adlyxin], route: sc, sponsor: Sanofi, aliases: []}
+
+  glp1_oral:
+    label: GLP-1 receptor agonist (oral)
+    mechanism: Oral GLP-1 receptor agonism (peptide with absorption enhancer, or small molecule)
+    area: both
+    generation: newer
+    molecules:
+      - {generic: oral semaglutide, brands: [Rybelsus], route: oral, sponsor: Novo Nordisk, aliases: [NN9924]}
+      - {generic: orforglipron, brands: [], route: oral, sponsor: Eli Lilly, aliases: [LY3502970]}
+      - {generic: CT-996, brands: [], route: oral, sponsor: Roche, aliases: [RG6652]}
+
+  gip_glp1:
+    label: GIP/GLP-1 dual agonist
+    mechanism: Dual GIP and GLP-1 receptor agonism
+    area: both
+    generation: newer
+    molecules:
+      - {generic: tirzepatide, brands: [Mounjaro, Zepbound], route: sc, sponsor: Eli Lilly, aliases: [LY3298176]}
+      - {generic: CT-388, brands: [], route: sc, sponsor: Roche, aliases: [RG6640]}
+
+  glp1_gipr_antagonist:
+    label: GLP-1 agonist / GIPR antagonist
+    mechanism: GLP-1 receptor agonism combined with GIP receptor antagonism (antibody-peptide conjugate)
+    area: obesity
+    generation: newer
+    molecules:
+      - {generic: maridebart cafraglutide, brands: [], route: sc, sponsor: Amgen, aliases: [MariTide, AMG 133]}
+
+  glucagon_combos:
+    label: Glucagon-receptor combination agonists (dual and triple)
+    mechanism: Adds glucagon receptor agonism (energy expenditure, liver fat) to GLP-1 +/- GIP agonism
+    area: obesity
+    generation: newer
+    molecules:
+      - {generic: retatrutide, brands: [], route: sc, sponsor: Eli Lilly, aliases: [LY3437943]}
+      - {generic: survodutide, brands: [], route: sc, sponsor: Boehringer Ingelheim, aliases: [BI 456906]}
+      - {generic: mazdutide, brands: [], route: sc, sponsor: Innovent / Eli Lilly, aliases: [IBI362, LY3305677]}
+      - {generic: pemvidutide, brands: [], route: sc, sponsor: Altimmune, aliases: [ALT-801]}
+
+  amylin:
+    label: Amylin analogues and amylin combinations
+    mechanism: Amylin (and/or calcitonin) receptor agonism; satiety, slowed gastric emptying; often paired with GLP-1
+    area: obesity
+    generation: newer
+    molecules:
+      - {generic: pramlintide, brands: [Symlin], route: sc, sponsor: AstraZeneca, aliases: []}
+      - {generic: cagrilintide, brands: [], route: sc, sponsor: Novo Nordisk, aliases: [NN9838]}
+      - {generic: cagrilintide/semaglutide, brands: [], route: sc, sponsor: Novo Nordisk, aliases: [CagriSema, NN9388]}
+      - {generic: amycretin, brands: [], route: sc, sponsor: Novo Nordisk, aliases: [NN9487, NN9490]}
+      - {generic: petrelintide, brands: [], route: sc, sponsor: Zealand Pharma / Roche, aliases: [ZP8396]}
+
+  sglt2:
+    label: SGLT2 inhibitor
+    mechanism: Inhibits renal glucose reabsorption; cardiorenal benefit
+    area: t2d
+    generation: newer
+    molecules:
+      - {generic: empagliflozin, brands: [Jardiance], route: oral, sponsor: Boehringer Ingelheim / Eli Lilly, aliases: []}
+      - {generic: dapagliflozin, brands: [Farxiga], route: oral, sponsor: AstraZeneca, aliases: []}
+      - {generic: canagliflozin, brands: [Invokana], route: oral, sponsor: Janssen, aliases: []}
+      - {generic: ertugliflozin, brands: [Steglatro], route: oral, sponsor: Merck / Pfizer, aliases: []}
+      - {generic: bexagliflozin, brands: [Brenzavvy], route: oral, sponsor: TheracosBio, aliases: []}
+      - {generic: sotagliflozin, brands: [Inpefa], route: oral, sponsor: Lexicon, aliases: []}
+
+  dpp4:
+    label: DPP-4 inhibitor
+    mechanism: Inhibits DPP-4, prolonging endogenous incretin activity
+    area: t2d
+    generation: legacy
+    molecules:
+      - {generic: sitagliptin, brands: [Januvia], route: oral, sponsor: Merck, aliases: []}
+      - {generic: linagliptin, brands: [Tradjenta], route: oral, sponsor: Boehringer Ingelheim / Eli Lilly, aliases: []}
+      - {generic: saxagliptin, brands: [Onglyza], route: oral, sponsor: AstraZeneca, aliases: []}
+      - {generic: alogliptin, brands: [Nesina], route: oral, sponsor: Takeda, aliases: []}
+
+  insulin_basal:
+    label: Basal insulin (incl. weekly)
+    mechanism: Long-acting insulin replacement
+    area: t2d
+    generation: legacy
+    molecules:
+      - {generic: insulin glargine, brands: [Lantus, Toujeo, Basaglar, Semglee, Rezvoglar], route: sc, sponsor: Sanofi (originator), aliases: []}
+      - {generic: insulin degludec, brands: [Tresiba], route: sc, sponsor: Novo Nordisk, aliases: []}
+      - {generic: insulin detemir, brands: [Levemir], route: sc, sponsor: Novo Nordisk, aliases: []}
+      - {generic: insulin isophane (NPH), brands: [Humulin N, Novolin N], route: sc, sponsor: various, aliases: []}
+      - {generic: insulin icodec, brands: [Awiqli], route: sc, sponsor: Novo Nordisk, aliases: [NN1436]}
+      - {generic: insulin efsitora alfa, brands: [], route: sc, sponsor: Eli Lilly, aliases: [LY3209590, BIF]}
+
+  insulin_prandial:
+    label: Prandial / rapid-acting insulin
+    mechanism: Mealtime insulin replacement
+    area: t2d
+    generation: legacy
+    molecules:
+      - {generic: insulin lispro, brands: [Humalog, Admelog, Lyumjev], route: sc, sponsor: Eli Lilly (originator), aliases: []}
+      - {generic: insulin aspart, brands: [NovoLog, Fiasp], route: sc, sponsor: Novo Nordisk, aliases: []}
+      - {generic: insulin glulisine, brands: [Apidra], route: sc, sponsor: Sanofi, aliases: []}
+      - {generic: insulin regular, brands: [Humulin R, Novolin R], route: sc, sponsor: various, aliases: []}
+
+  insulin_glp1_frc:
+    label: Basal insulin + GLP-1 fixed-ratio combination
+    mechanism: Basal insulin co-formulated with a GLP-1 receptor agonist
+    area: t2d
+    generation: newer
+    molecules:
+      - {generic: insulin degludec/liraglutide, brands: [Xultophy], route: sc, sponsor: Novo Nordisk, aliases: [IDegLira]}
+      - {generic: insulin glargine/lixisenatide, brands: [Soliqua], route: sc, sponsor: Sanofi, aliases: [iGlarLixi]}
+
+  legacy_oral_t2d:
+    label: Legacy oral T2D agents (comparator)
+    mechanism: Metformin, sulfonylureas, thiazolidinediones. Included as the denominator for newer-agent uptake, not as a competitor set
+    area: t2d
+    generation: legacy
+    molecules:
+      - {generic: metformin, brands: [Glucophage], route: oral, sponsor: generic, aliases: []}
+      - {generic: glipizide, brands: [Glucotrol], route: oral, sponsor: generic, aliases: []}
+      - {generic: glimepiride, brands: [Amaryl], route: oral, sponsor: generic, aliases: []}
+      - {generic: glyburide, brands: [], route: oral, sponsor: generic, aliases: []}
+      - {generic: pioglitazone, brands: [Actos], route: oral, sponsor: generic, aliases: []}
+
+  legacy_aom:
+    label: Older anti-obesity medications
+    mechanism: Non-incretin weight-management agents
+    area: obesity
+    generation: legacy
+    molecules:
+      - {generic: phentermine/topiramate, brands: [Qsymia], route: oral, sponsor: Vivus, aliases: []}
+      - {generic: naltrexone/bupropion, brands: [Contrave], route: oral, sponsor: Currax, aliases: []}
+      - {generic: orlistat, brands: [Xenical, Alli], route: oral, sponsor: various, aliases: []}
+      - {generic: setmelanotide, brands: [Imcivree], route: sc, sponsor: Rhythm, aliases: []}
+
+  emerging_other:
+    label: Other emerging mechanisms
+    mechanism: Non-incretin or muscle-preserving approaches (e.g. activin type II receptor blockade)
+    area: obesity
+    generation: newer
+    molecules:
+      - {generic: bimagrumab, brands: [], route: iv, sponsor: Eli Lilly, aliases: [BYM338]}
+
+# Conditions used to sweep ClinicalTrials.gov in addition to the molecule list,
+# so we catch new entrants whose names are not in this file yet.
+trial_conditions:
+  - Obesity
+  - Overweight
+  - Type 2 Diabetes
+  - Diabetes Mellitus, Type 2
