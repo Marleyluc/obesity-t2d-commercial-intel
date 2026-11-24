@@ -35,6 +35,11 @@ sources:
   # --- Canada (market access layer; there is no public Canadian prescriber-level data) ---
   hc_dpd:
     base_url: https://health-products.canada.ca/api/drug   # Health Canada Drug Product Database API
+    request_delay_s: 0.3
+    # Search by ingredient only for "newer" classes: for legacy molecules (metformin, old
+    # insulins) an ingredient search returns hundreds of generic products, so we search
+    # their originator brand names instead.
+    ingredient_search_generations: [newer]
   ontario_odb:
     dataset_url: https://data.ontario.ca/dataset/ontario-drug-benefit-formulary-comparative-drug-index-formularycdi
   cda_amc:
