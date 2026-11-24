@@ -12,6 +12,15 @@ sources:
     base_url: https://clinicaltrials.gov/api/v2
     page_size: 1000           # API maximum
     request_delay_s: 0.5      # be polite; the API has no key but does rate-limit
+    # Only the fields we use. Leaving out the results section keeps each snapshot small.
+    fields: [NCTId, BriefTitle, Acronym, OverallStatus, WhyStopped, Phase, StudyType,
+             StartDate, PrimaryCompletionDate, CompletionDate, StudyFirstPostDate,
+             LastUpdatePostDate, LeadSponsorName, LeadSponsorClass, CollaboratorName,
+             Condition, InterventionName, InterventionType, EnrollmentCount,
+             LocationCountry, HasResults]
+    # Condition sweep: catches new entrants not yet in drug_classes.yaml.
+    # Restricted to recent interventional Phase 2/3 trials so it stays focused on industry pipeline.
+    condition_filter: "AREA[StudyType]INTERVENTIONAL AND AREA[Phase](PHASE2 OR PHASE3) AND AREA[StartDate]RANGE[2018-01-01, MAX]"
   openfda:
     base_url: https://api.fda.gov
     request_delay_s: 0.3      # without a key: 240 req/min, 1,000/day; with a key: 120,000/day
@@ -31,8 +40,8 @@ sources:
     # Canada's Drug Agency (formerly CADTH) reimbursement recommendations. No API:
     # a small hand-curated table in config/cda_amc_reviews.csv (built in Milestone 2).
     curated_file: config/cda_amc_reviews.csv
-  ctgov_canada:
-    location_filter: Canada  # ClinicalTrials.gov query.locn, for trials with Canadian sites
+  # Canadian trial activity needs no separate pull: every ClinicalTrials.gov record
+  # includes LocationCountry, so M3 filters for "Canada" locally.
 
 http:
   timeout_s: 30

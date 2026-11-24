@@ -10,6 +10,9 @@
 #   mechanism       : one-line mechanism of action
 #   area            : t2d | obesity | both  (primary market the class competes in)
 #   generation      : legacy | newer  (used in M4 for the "newer-agent uptake" feature)
+#   track_trials    : optional, default true. Can be set on a class or on a single molecule. false = skip in the ClinicalTrials.gov pull
+#                     (legacy comparators have thousands of academic trials and no CI value;
+#                     they stay in scope for Part D as the denominator for newer-agent uptake)
 #   molecules       : list of
 #       generic     : INN / USAN name (lower case)
 #       brands      : US brand names (empty for pipeline assets)
@@ -80,7 +83,7 @@ classes:
       - {generic: pramlintide, brands: [Symlin], route: sc, sponsor: AstraZeneca, aliases: []}
       - {generic: cagrilintide, brands: [], route: sc, sponsor: Novo Nordisk, aliases: [NN9838]}
       - {generic: cagrilintide/semaglutide, brands: [], route: sc, sponsor: Novo Nordisk, aliases: [CagriSema, NN9388]}
-      - {generic: amycretin, brands: [], route: sc, sponsor: Novo Nordisk, aliases: [NN9487, NN9490]}
+      - {generic: amycretin, brands: [], route: sc, sponsor: Novo Nordisk, aliases: [NNC0487-0111, NN9487, NN9490]}
       - {generic: petrelintide, brands: [], route: sc, sponsor: Zealand Pharma / Roche, aliases: [ZP8396]}
 
   sglt2:
@@ -116,9 +119,9 @@ classes:
       - {generic: insulin glargine, brands: [Lantus, Toujeo, Basaglar, Semglee, Rezvoglar], route: sc, sponsor: Sanofi (originator), aliases: []}
       - {generic: insulin degludec, brands: [Tresiba], route: sc, sponsor: Novo Nordisk, aliases: []}
       - {generic: insulin detemir, brands: [Levemir], route: sc, sponsor: Novo Nordisk, aliases: []}
-      - {generic: insulin isophane (NPH), brands: [Humulin N, Novolin N], route: sc, sponsor: various, aliases: []}
+      - {generic: insulin isophane (NPH), brands: [Humulin N, Novolin N], route: sc, sponsor: various, aliases: [], track_trials: false}
       - {generic: insulin icodec, brands: [Awiqli], route: sc, sponsor: Novo Nordisk, aliases: [NN1436]}
-      - {generic: insulin efsitora alfa, brands: [], route: sc, sponsor: Eli Lilly, aliases: [LY3209590, BIF]}
+      - {generic: insulin efsitora alfa, brands: [], route: sc, sponsor: Eli Lilly, aliases: [LY3209590]}
 
   insulin_prandial:
     label: Prandial / rapid-acting insulin
@@ -129,7 +132,7 @@ classes:
       - {generic: insulin lispro, brands: [Humalog, Admelog, Lyumjev], route: sc, sponsor: Eli Lilly (originator), aliases: []}
       - {generic: insulin aspart, brands: [NovoLog, Fiasp], route: sc, sponsor: Novo Nordisk, aliases: []}
       - {generic: insulin glulisine, brands: [Apidra], route: sc, sponsor: Sanofi, aliases: []}
-      - {generic: insulin regular, brands: [Humulin R, Novolin R], route: sc, sponsor: various, aliases: []}
+      - {generic: insulin regular, brands: [Humulin R, Novolin R], route: sc, sponsor: various, aliases: [], track_trials: false}
 
   insulin_glp1_frc:
     label: Basal insulin + GLP-1 fixed-ratio combination
@@ -141,6 +144,7 @@ classes:
       - {generic: insulin glargine/lixisenatide, brands: [Soliqua], route: sc, sponsor: Sanofi, aliases: [iGlarLixi]}
 
   legacy_oral_t2d:
+    track_trials: false
     label: Legacy oral T2D agents (comparator)
     mechanism: Metformin, sulfonylureas, thiazolidinediones. Included as the denominator for newer-agent uptake, not as a competitor set
     area: t2d
@@ -153,6 +157,7 @@ classes:
       - {generic: pioglitazone, brands: [Actos], route: oral, sponsor: generic, aliases: []}
 
   legacy_aom:
+    track_trials: false
     label: Older anti-obesity medications
     mechanism: Non-incretin weight-management agents
     area: obesity
@@ -173,8 +178,8 @@ classes:
 
 # Conditions used to sweep ClinicalTrials.gov in addition to the molecule list,
 # so we catch new entrants whose names are not in this file yet.
+# The API expands synonyms itself ("Type 2 Diabetes" also finds "Diabetes Mellitus, Type 2"),
+# so one term per condition is enough. Tested 2026-11-24: the two T2D spellings returned identical results.
 trial_conditions:
   - Obesity
-  - Overweight
   - Type 2 Diabetes
-  - Diabetes Mellitus, Type 2

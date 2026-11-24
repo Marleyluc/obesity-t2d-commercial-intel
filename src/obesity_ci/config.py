@@ -57,6 +57,7 @@ def molecules() -> pd.DataFrame:
                     "sponsor": m["sponsor"],
                     "aliases": m.get("aliases", []),
                     "is_pipeline": len(m.get("brands", [])) == 0,
+                    "track_trials": m.get("track_trials", c.get("track_trials", True)),
                 }
             )
     return pd.DataFrame(rows)
