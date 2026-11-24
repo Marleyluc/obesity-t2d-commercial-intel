@@ -35,13 +35,19 @@ class PoliteSession:
         self.session.headers["User-Agent"] = st["user_agent"]
         self.session.mount("https://", HTTPAdapter(max_retries=retry))
 
-    def get_json(self, url: str, params: dict | None = None) -> dict:
-        """GET a URL and return parsed JSON. Raises a readable error on failure."""
+    def get_json(self, url: str, params: dict | None = None, none_on_404: bool = False) -> dict | None:
+        """GET a URL and return parsed JSON. Raises a readable error on failure.
+
+        none_on_404: some APIs (openFDA) answer "no results" with HTTP 404 instead of an
+        empty list. Set this to treat that as "nothing found" rather than an error.
+        """
         wait = self.delay_s - (time.monotonic() - self._last_call)
         if wait > 0:
             time.sleep(wait)
         r = self.session.get(url, params=params, timeout=self.timeout)
         self._last_call = time.monotonic()
+        if r.status_code == 404 and none_on_404:
+            return None
         if not r.ok:
             raise RuntimeError(f"HTTP {r.status_code} for {r.url}\nServer said: {r.text[:500]}")
         return r.json()

@@ -24,6 +24,7 @@ sources:
   openfda:
     base_url: https://api.fda.gov
     request_delay_s: 0.3      # without a key: 240 req/min, 1,000/day; with a key: 120,000/day
+    page_limit: 100           # openFDA maximum per request for these endpoints
   cms_partd:
     catalog_url: https://data.cms.gov/data.json
     dataset_title: "Medicare Part D Prescribers - by Provider and Drug"

@@ -4,6 +4,10 @@
 # a molecule here adds it everywhere. Approval status is deliberately NOT stored
 # here: it comes from openFDA, so the config never goes stale.
 #
+# Brand names are search terms only. Whether a molecule is approved comes from openFDA /
+# Health Canada (e.g. the 2026-11-24 openFDA pull revealed FDA approvals for orforglipron
+# (Foundayo, 2026-04-01) and efsitora (Onswik, 2026-09-23); their brands were then added here).
+#
 # Fields
 #   class id        : short snake_case key used in every table
 #   label           : human-readable class name for the dashboard
@@ -43,7 +47,7 @@ classes:
     generation: newer
     molecules:
       - {generic: oral semaglutide, brands: [Rybelsus], route: oral, sponsor: Novo Nordisk, aliases: [NN9924]}
-      - {generic: orforglipron, brands: [], route: oral, sponsor: Eli Lilly, aliases: [LY3502970]}
+      - {generic: orforglipron, brands: [Foundayo], route: oral, sponsor: Eli Lilly, aliases: [LY3502970]}
       - {generic: CT-996, brands: [], route: oral, sponsor: Roche, aliases: [RG6652]}
 
   gip_glp1:
@@ -121,7 +125,7 @@ classes:
       - {generic: insulin detemir, brands: [Levemir], route: sc, sponsor: Novo Nordisk, aliases: []}
       - {generic: insulin isophane (NPH), brands: [Humulin N, Novolin N], route: sc, sponsor: various, aliases: [], track_trials: false}
       - {generic: insulin icodec, brands: [Awiqli], route: sc, sponsor: Novo Nordisk, aliases: [NN1436]}
-      - {generic: insulin efsitora alfa, brands: [], route: sc, sponsor: Eli Lilly, aliases: [LY3209590]}
+      - {generic: insulin efsitora alfa, brands: [Onswik], route: sc, sponsor: Eli Lilly, aliases: [LY3209590]}
 
   insulin_prandial:
     label: Prandial / rapid-acting insulin
