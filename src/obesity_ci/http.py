@@ -51,3 +51,19 @@ class PoliteSession:
         if not r.ok:
             raise RuntimeError(f"HTTP {r.status_code} for {r.url}\nServer said: {r.text[:500]}")
         return r.json()
+
+    def download(self, url: str, dest) -> int:
+        """Stream a (possibly large) file to disk without loading it into memory. Returns bytes written."""
+        wait = self.delay_s - (time.monotonic() - self._last_call)
+        if wait > 0:
+            time.sleep(wait)
+        with self.session.get(url, stream=True, timeout=self.timeout) as r:
+            self._last_call = time.monotonic()
+            if not r.ok:
+                raise RuntimeError(f"HTTP {r.status_code} for {url}")
+            n = 0
+            with open(dest, "wb") as f:
+                for chunk in r.iter_content(chunk_size=1 << 20):
+                    f.write(chunk)
+                    n += len(chunk)
+        return n

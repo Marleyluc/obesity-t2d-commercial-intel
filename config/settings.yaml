@@ -41,7 +41,12 @@ sources:
     # their originator brand names instead.
     ingredient_search_generations: [newer]
   ontario_odb:
-    dataset_url: https://data.ontario.ca/dataset/ontario-drug-benefit-formulary-comparative-drug-index-formularycdi
+    # The open-data catalogue entry (data.ontario.ca) still points to a retired 2019 link on
+    # health.gov.on.ca, which no longer resolves (found 2026-11-24). The live "XML Data
+    # Extract" is linked from this ontario.ca page, which is updated with each edition, so we
+    # read the page and follow its .xml/.xsd links instead of hard-coding a file URL.
+    page_url: https://www.ontario.ca/document/ontario-drug-benefit-odb-formulary-comparative-drug-index-cdi-and-monthly-formulary-0
+    link_extensions: [xml, xsd]   # the data extract and its schema; PDFs are skipped
   cda_amc:
     # Canada's Drug Agency (formerly CADTH) reimbursement recommendations. No API:
     # a small hand-curated table in config/cda_amc_reviews.csv (built in Milestone 2).
