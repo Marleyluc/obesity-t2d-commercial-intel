@@ -37,6 +37,13 @@ def write_manifest(folder: Path, source: str, entries: list[dict], extra: dict |
 
 
 def list_snapshots(source: str) -> list[Path]:
-    """All snapshot folders for a source, oldest first. M3 diffs the last two."""
+    """All COMPLETE snapshot folders for a source, oldest first. M3 diffs the last two.
+
+    A pull writes manifest.json as its very last step, so a folder without one is an
+    interrupted or failed pull (found 2026-11-25: an empty ctgov folder broke the diff).
+    Those are skipped, never compared.
+    """
     root = config.path("raw") / source
-    return sorted(p for p in root.iterdir() if p.is_dir()) if root.exists() else []
+    if not root.exists():
+        return []
+    return sorted(p for p in root.iterdir() if p.is_dir() and (p / "manifest.json").exists())

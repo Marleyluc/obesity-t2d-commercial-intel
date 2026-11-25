@@ -66,6 +66,9 @@ def test_pull_writes_raw_files_and_manifest(tmp_path, monkeypatch):
     assert result["unique_trials"] == 3
 
 
-def test_unknown_only_filter_fails_loudly():
+def test_unknown_only_filter_fails_loudly(tmp_path, monkeypatch):
+    # Redirect data/raw: pull() creates today's snapshot folder before it fails, and in the
+    # real data/ that left an empty folder that broke the change log (found 2026-11-25).
+    monkeypatch.setitem(config.settings()["paths"], "raw", str(tmp_path))
     with pytest.raises(ValueError):
         ctgov.pull(only="not_a_drug", session=FakeSession())
