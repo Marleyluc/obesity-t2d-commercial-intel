@@ -48,3 +48,12 @@ grid-based list; 65.9% vs 54.5% are high launch fit).
 | **One card per segment** with fit, size, share of GLP-1 claims, names in the plan, description and recommended action. | Matches the M4 exit criterion (name, description, size, action) and is what a brand team would brief reps with. | None. |
 | **US map with a switch:** names in the call plan, or % of the state's GLP-1 claims reached. | Raw names mostly follow population; the % view shows where the plan is thin, which is a case for inside sales or digital rather than more reps. | Territories and unknown states are in the table only. The map shapes load from Plotly's CDN, so the map needs internet. |
 | **Call list: filters (state, specialty, segment, tier, in-plan), NPI search, registry look-up link, full CSV download.** | It's the file sales operations would load into the CRM. Names stay out of our data; the NPI registry link shows who it is when needed. | The table shows the first 5,000 rows for speed; the download has all. |
+
+## Chunk 5: About page, speed, deployment
+
+| Decision | Why | Cost |
+|---|---|---|
+| **About page: sources with "as of" dates from `meta.json`, the method in three bullets, and the nine limits** a reader must know (from M4, plus trial-date caveats). | A dashboard without visible freshness and limits invites the wrong conclusion (e.g. treating 2024 Medicare data as this year's whole market). | None. |
+| **Speed check:** each page renders in 0.2-0.8 s in Streamlit's test runner (cold, in the cloud sandbox), against the < 5 s target; the smoke tests fail if any page takes over 5 s. | The exit criterion, checked by a test rather than by eye. | The browser adds network time when deployed. |
+| **`app/requirements.txt` lists only what the app needs** (streamlit, pandas, pyarrow, plotly), pinned to the versions tested. | Streamlit Community Cloud installs from the entry file's folder first; a short list builds faster and avoids installing the whole pipeline. | Update the pins when you upgrade locally. |
+| **Deployed on Streamlit Community Cloud from `main`, entry file `app/streamlit_app.py`.** | Free and connected to GitHub: each push redeploys. | Free-tier apps sleep after inactivity and take ~30 s to wake. Treated as internal in the write-up; the link itself is public unless restricted in the app's sharing settings. |
