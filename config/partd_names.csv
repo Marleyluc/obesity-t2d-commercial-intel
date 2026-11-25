@@ -1,0 +1,80 @@
+# Every CMS Part D generic name in our extract, mapped to one of our molecules or excluded with a reason.
+# Built 2026-11-25 from the data year 2024 extract. A new name in a new year makes the M4 build stop until it is added here.
+cms_generic_name,generic,status,note
+Metformin Hcl,metformin,in_scope,
+Semaglutide,semaglutide,in_scope,split by brand in code: Rybelsus = oral semaglutide; Ozempic and Wegovy = semaglutide
+Empagliflozin,empagliflozin,in_scope,
+Bupropion Hcl,,excluded,antidepressant alone; only part of Contrave
+"Insulin Glargine,hum.Rec.Anlog",insulin glargine,in_scope,
+Glipizide,glipizide,in_scope,
+Dapagliflozin Propanediol,dapagliflozin,in_scope,
+Tirzepatide,tirzepatide,in_scope,
+Glimepiride,glimepiride,in_scope,
+Dulaglutide,dulaglutide,in_scope,
+Sitagliptin Phosphate,sitagliptin,in_scope,
+Pioglitazone Hcl,pioglitazone,in_scope,
+Topiramate,,excluded,epilepsy/migraine alone; only part of Qsymia
+Insulin Lispro,insulin lispro,in_scope,
+Insulin Degludec,insulin degludec,in_scope,
+Insulin Aspart,insulin aspart,in_scope,
+Linagliptin,linagliptin,in_scope,
+Sitagliptin Phos/Metformin Hcl,sitagliptin,in_scope,"fixed-dose combination: counted once, under its newest-mechanism part"
+Insulin Glargine-Yfgn,insulin glargine,in_scope,biosimilar (Semglee)
+Insulin Nph Human Isophane,insulin isophane (nph),in_scope,
+Empagliflozin/Metformin Hcl,empagliflozin,in_scope,"fixed-dose combination: counted once, under its newest-mechanism part"
+Insulin Nph Hum/Reg Insulin Hm,insulin isophane (nph),in_scope,premix 70/30: counted under its basal part
+"Insulin Regular, Human",insulin regular,in_scope,
+Insulin Detemir,insulin detemir,in_scope,
+Insulin Aspart (Niacinamide),insulin aspart,in_scope,Fiasp
+Naltrexone Hcl,,excluded,alcohol/opioid use disorder alone; only part of Contrave
+"Syringe-Needle,insulin,0.5 Ml",,excluded,"device or supply, not a drug"
+Insulin Glargine/Lixisenatide,insulin glargine/lixisenatide,in_scope,
+"Insulin Pump Cart,auto,bt,g6/7",,excluded,"device or supply, not a drug"
+"Syringe And Needle,insulin,1ml",,excluded,"device or supply, not a drug"
+Insulin Aspart Prot/Insuln Asp,insulin aspart,in_scope,premix 70/30: counted under aspart
+Dapaglifloz Propaned/Metformin,dapagliflozin,in_scope,"fixed-dose combination: counted once, under its newest-mechanism part"
+Insulin Lispro Protamin/Lispro,insulin lispro,in_scope,premix 75/25: counted under lispro
+Glipizide/Metformin Hcl,glipizide,in_scope,"fixed-dose combination: counted once, under its newest-mechanism part"
+Canagliflozin,canagliflozin,in_scope,
+Liraglutide,liraglutide,in_scope,
+Empaglifloz/Linaglip/Metformin,empagliflozin,in_scope,"fixed-dose combination: counted once, under its newest-mechanism part"
+Exenatide Microspheres,exenatide,in_scope,
+Empagliflozin/Linagliptin,empagliflozin,in_scope,"fixed-dose combination: counted once, under its newest-mechanism part"
+Linagliptin/Metformin Hcl,linagliptin,in_scope,"fixed-dose combination: counted once, under its newest-mechanism part"
+Glyburide,glyburide,in_scope,
+Insulin Lispro-Aabc,insulin lispro,in_scope,Lyumjev
+Dextromethorphan Hbr/Bupropion,,excluded,depression drug (Auvelity)
+Alogliptin Benzoate,alogliptin,in_scope,
+Methylnaltrexone Bromide,,excluded,opioid-induced constipation (Relistor)
+"Insulin Pump Cart,cont Inf,bt",,excluded,"device or supply, not a drug"
+Insulin Degludec/Liraglutide,insulin degludec/liraglutide,in_scope,
+Naltrexone Microspheres,,excluded,"Vivitrol, opioid/alcohol use disorder"
+Ertugliflozin Pidolate,ertugliflozin,in_scope,
+Pioglitazone Hcl/Metformin Hcl,pioglitazone,in_scope,"fixed-dose combination: counted once, under its newest-mechanism part"
+Saxagliptin Hcl,saxagliptin,in_scope,
+Glyburide/Metformin Hcl,glyburide,in_scope,"fixed-dose combination: counted once, under its newest-mechanism part"
+Canagliflozin/Metformin Hcl,canagliflozin,in_scope,"fixed-dose combination: counted once, under its newest-mechanism part"
+"Sub-Q Insulin Device, 40 Unit",,excluded,"device or supply, not a drug"
+"Sub-Q Insulin Device, 20 Unit",,excluded,"device or supply, not a drug"
+"Bolus Insulin Pump, 200 Unit",,excluded,"device or supply, not a drug"
+"Sub-Q Insulin Device, 30 Unit",,excluded,"device or supply, not a drug"
+Sotagliflozin,sotagliflozin,in_scope,
+Insulin Glargine-Aglr,insulin glargine,in_scope,biosimilar (Rezvoglar)
+Alogliptin Benz/Metformin Hcl,alogliptin,in_scope,"fixed-dose combination: counted once, under its newest-mechanism part"
+Bupropion Hbr,,excluded,antidepressant alone; only part of Contrave
+Exenatide,exenatide,in_scope,
+Sitagliptin,sitagliptin,in_scope,
+Saxagliptin Hcl/Metformin Hcl,saxagliptin,in_scope,"fixed-dose combination: counted once, under its newest-mechanism part"
+"Glyburide,micronized",glyburide,in_scope,
+Insulin Glulisine,insulin glulisine,in_scope,
+Dapagliflozin/Saxagliptin Hcl,dapagliflozin,in_scope,"fixed-dose combination: counted once, under its newest-mechanism part"
+Pioglitazone Hcl/Glimepiride,pioglitazone,in_scope,"fixed-dose combination: counted once, under its newest-mechanism part"
+Ertugliflozin/Metformin,ertugliflozin,in_scope,"fixed-dose combination: counted once, under its newest-mechanism part"
+"Syringe With Needle, Insulin",,excluded,"device or supply, not a drug"
+Pramlintide Acetate,pramlintide,in_scope,
+Phentermine Hcl,phentermine/topiramate,in_scope,"phentermine alone (an older anti-obesity drug), grouped with phentermine/topiramate"
+Alogliptin Benz/Pioglitazone,alogliptin,in_scope,"fixed-dose combination: counted once, under its newest-mechanism part"
+Ertugliflozin/Sitagliptin Phos,ertugliflozin,in_scope,"fixed-dose combination: counted once, under its newest-mechanism part"
+Naltrexone Hcl/Bupropion Hcl,naltrexone/bupropion,in_scope,
+"Insulin Pump Cart,cont Inf,rf",,excluded,"device or supply, not a drug"
+"Insulin Pmp Cart,aut,g6/7,cntr",,excluded,"device or supply, not a drug"
