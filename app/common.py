@@ -21,6 +21,9 @@ BLUE_RAMP = ["#cce3fd", "#9dc8f7", "#6aabf1", "#338ced", "#2370cd", "#1757ac", "
 GREY = "#9c9c9c"
 
 CTGOV = "https://clinicaltrials.gov/study/{}"
+NPI_REGISTRY = "https://npiregistry.cms.hhs.gov/provider-view/{}"
+US_STATES = set("AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ "
+                "NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split())
 DRUGS_AT_FDA = "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo={}"
 
 

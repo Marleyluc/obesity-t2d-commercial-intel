@@ -34,6 +34,7 @@ with c3, st.container(border=True):
               help="GLP-1 and GIP/GLP-1 claims in Medicare Part D written by the prescribers in the call plan.")
     st.markdown(f"{m['plan_pct_high_fit']}% of the names already prescribe in the class, "
                 f"vs {m['baseline_pct_high_fit']}% for a list built on volume and adoption alone.")
+    st.page_link("views/segments.py", label="See who to target and why", icon="🎯")
 
 C.source_note(f"Trials: ClinicalTrials.gov, {m['landscape_snapshot']}",
               f"Prescribing: CMS Medicare Part D, {m['part_d_data_year']} data",

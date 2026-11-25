@@ -38,3 +38,13 @@ grid-based list; 65.9% vs 54.5% are high launch fit).
 | **Every [ID] in the brief becomes a link** (NCT to ClinicalTrials.gov, NDA/BLA/ANDA to Drugs@FDA), and adjacent citations are shown as one list. | One click from a sentence to its source record is what makes a grounded brief checkable. | DINs stay plain text: Health Canada has no stable per-DIN link. |
 | **"Evidence" expander shows the exact rows the model saw** (`brief.input.json`). | Shows the grounding, not just claims it. | None. |
 | **Housekeeping rows ("Primary label source changed", "No longer returned") are hidden by default and counted in their own box.** | They describe our pipeline, not the market, and need a human check first (same rule as the brief). | One toggle to see them. |
+
+## Chunk 4: Who to target and Call list (`app/views/segments.py`, `app/views/call_list.py`)
+
+| Decision | Why | Cost |
+|---|---|---|
+| **The page opens with the answer in one paragraph**, then four numbers, then the evidence. | The exit test is "who should we target and why, in under 2 minutes". The answer has to be readable before any chart. | None. |
+| **Targeting matrix coloured by tier, not by count.** Each box shows tier, prescribers and share of GLP-1 claims. | The tier is the decision; colour should point at it. Counts are printed, so nothing depends on reading shades. | None. |
+| **One card per segment** with fit, size, share of GLP-1 claims, names in the plan, description and recommended action. | Matches the M4 exit criterion (name, description, size, action) and is what a brand team would brief reps with. | None. |
+| **US map with a switch:** names in the call plan, or % of the state's GLP-1 claims reached. | Raw names mostly follow population; the % view shows where the plan is thin, which is a case for inside sales or digital rather than more reps. | Territories and unknown states are in the table only. The map shapes load from Plotly's CDN, so the map needs internet. |
+| **Call list: filters (state, specialty, segment, tier, in-plan), NPI search, registry look-up link, full CSV download.** | It's the file sales operations would load into the CRM. Names stay out of our data; the NPI registry link shows who it is when needed. | The table shows the first 5,000 rows for speed; the download has all. |

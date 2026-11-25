@@ -14,5 +14,7 @@ PAGES = [
     st.Page("views/home.py", title="Overview", icon="🏠", default=True),
     st.Page("views/landscape.py", title="Landscape", icon="🧪"),
     st.Page("views/changes.py", title="What changed", icon="📰"),
+    st.Page("views/segments.py", title="Who to target", icon="🎯"),
+    st.Page("views/call_list.py", title="Call list", icon="📇"),
 ]
 st.navigation(PAGES).run()
