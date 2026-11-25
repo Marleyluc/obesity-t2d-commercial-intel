@@ -33,12 +33,13 @@ SOURCE = "openfda"
 
 EVENT_TYPES = {"EFFICACY": "Efficacy supplement", "LABELING": "Labeling change",
                "MANUF (CMC)": "Manufacturing change", "REMS": "REMS change"}
-# FDA's own names for human insulins, which share no word with our generic names.
+# Regulators' own names for human insulins, which share no word with our generic names
+# (FDA: "INSULIN SUSP ISOPHANE RECOMBINANT HUMAN"; Health Canada: "INSULIN NPH HUMAN DNA ORIGIN").
 # "insulin human" must not match NPH ("INSULIN SUSP ISOPHANE RECOMBINANT HUMAN"): the
 # patterns require the words to be adjacent, so it doesn't.
 FDA_INGREDIENT_ALIASES = {
     "insulin regular": ["insulin human", "insulin recombinant human"],
-    "insulin isophane (nph)": ["insulin susp isophane", "isophane insulin"],
+    "insulin isophane (nph)": ["insulin susp isophane", "isophane insulin", "insulin nph"],
 }
 # Label publishers that repackage someone else's drug (seen in the 2026-11-24 pull).
 REPACKAGERS = r"repack|medication solutions|aphena|cardinal health|redpharm|bryant ranch|proficient rx|quality care|preferred pharmaceuticals|direct.?rx|henry schein"
