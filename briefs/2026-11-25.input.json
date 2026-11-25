@@ -1,0 +1,64 @@
+{
+  "period": {
+    "from": "2026-11-24",
+    "to": "2026-11-25"
+  },
+  "counts": {
+    "all_changes": 12,
+    "sent": 3,
+    "by_importance_sent": {
+      "low": 3
+    }
+  },
+  "omitted": {
+    "needs_human_review": {
+      "Primary label source changed": 9
+    },
+    "low_importance_not_sent": 0,
+    "over_row_limit": 0
+  },
+  "changes": [
+    {
+      "id": "NDA022271",
+      "source": "FDA (Drugs@FDA and labels)",
+      "change_type": "New FDA action",
+      "importance": "low",
+      "molecules": "alogliptin",
+      "classes": "DPP-4 inhibitor",
+      "sponsors": "Takeda",
+      "title": "NESINA",
+      "field": "event_type",
+      "old": "",
+      "new": "Labeling change",
+      "detail": "TAKEDA PHARMS USA; SUPPL-17; 2026-11-20; https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2026/022271Orig1s017;022426Orig1s018;203414Orig1s020ltr.pdf"
+    },
+    {
+      "id": "NDA022426",
+      "source": "FDA (Drugs@FDA and labels)",
+      "change_type": "New FDA action",
+      "importance": "low",
+      "molecules": "alogliptin; pioglitazone",
+      "classes": "DPP-4 inhibitor; Legacy oral T2D agents (comparator)",
+      "sponsors": "Takeda",
+      "title": "OSENI",
+      "field": "event_type",
+      "old": "",
+      "new": "Labeling change",
+      "detail": "TAKEDA PHARMS USA; SUPPL-18; 2026-11-23; https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2026/022271Orig1s017;022426Orig1s018;203414Orig1s020ltr.pdf"
+    },
+    {
+      "id": "NDA203414",
+      "source": "FDA (Drugs@FDA and labels)",
+      "change_type": "New FDA action",
+      "importance": "low",
+      "molecules": "alogliptin; metformin",
+      "classes": "DPP-4 inhibitor; Legacy oral T2D agents (comparator)",
+      "sponsors": "Takeda",
+      "title": "KAZANO",
+      "field": "event_type",
+      "old": "",
+      "new": "Labeling change",
+      "detail": "TAKEDA PHARMS USA; SUPPL-20; 2026-11-20; https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2026/022271Orig1s017;022426Orig1s018;203414Orig1s020ltr.pdf"
+    }
+  ]
+}
