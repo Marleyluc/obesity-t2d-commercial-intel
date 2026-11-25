@@ -25,6 +25,7 @@ with c2, st.container(border=True):
     st.metric(f"Changes in the latest log ({m['change_log']})", f"{0 if changes is None else len(changes):,}")
     for h in C.brief_headlines(C.brief()):
         st.markdown(f"- {h}")
+    st.page_link("views/changes.py", label="Read the brief", icon="📰")
 with c3, st.container(border=True):
     st.subheader("Who to call")
     st.metric(f"Share of GLP-1 claims reached by {m['call_capacity']:,} calls",

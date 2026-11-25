@@ -13,5 +13,6 @@ st.set_page_config(page_title="Obesity & T2D intel", page_icon="💊", layout="w
 PAGES = [
     st.Page("views/home.py", title="Overview", icon="🏠", default=True),
     st.Page("views/landscape.py", title="Landscape", icon="🧪"),
+    st.Page("views/changes.py", title="What changed", icon="📰"),
 ]
 st.navigation(PAGES).run()

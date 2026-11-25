@@ -29,3 +29,12 @@ grid-based list; 65.9% vs 54.5% are high launch fit).
 | **Colours: blue = Lilly, orange = Novo, grey = everyone else; Phase 3 blue vs Phase 2 orange; one blue ramp for counts.** | The palette was checked with a colour-blind simulator (worst pair still clearly apart). Every chart also has a table or labels, so colour is never the only clue. | None. |
 | **Trial IDs link to ClinicalTrials.gov; the readout table downloads as CSV.** | Anyone can check a dot against the source in one click. | None. |
 | **Smoke tests run every page with Streamlit's test runner** on the committed `app/data/`, and fail if a page errors or takes over 5 seconds. | Catches a broken page before you open the app. | They test that pages run, not that the charts look right; that's a look-and-check. |
+
+## Chunk 3: the What changed page (`app/views/changes.py`)
+
+| Decision | Why | Cost |
+|---|---|---|
+| **Two tabs: the brief first, then every change.** | The brand lead reads the memo; the analyst checks the rows behind it. | None. |
+| **Every [ID] in the brief becomes a link** (NCT to ClinicalTrials.gov, NDA/BLA/ANDA to Drugs@FDA), and adjacent citations are shown as one list. | One click from a sentence to its source record is what makes a grounded brief checkable. | DINs stay plain text: Health Canada has no stable per-DIN link. |
+| **"Evidence" expander shows the exact rows the model saw** (`brief.input.json`). | Shows the grounding, not just claims it. | None. |
+| **Housekeeping rows ("Primary label source changed", "No longer returned") are hidden by default and counted in their own box.** | They describe our pipeline, not the market, and need a human check first (same rule as the brief). | One toggle to see them. |

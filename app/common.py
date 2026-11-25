@@ -49,6 +49,27 @@ def brief_headlines(text: str | None, n: int = 3) -> list[str]:
     return [re.sub(r"\s*\[[^\]]+\]", "", b).strip() for b in bullets[:n]]
 
 
+def id_url(id_: str) -> str | None:
+    """Where a change-log ID can be checked: ClinicalTrials.gov or Drugs@FDA. DINs have no stable link."""
+    id_ = id_.replace(" ", "")
+    if re.fullmatch(r"NCT\d{8}", id_):
+        return CTGOV.format(id_)
+    if re.fullmatch(r"(NDA|BLA|ANDA)\d{6}", id_):
+        return DRUGS_AT_FDA.format(re.sub(r"\D", "", id_))
+    return None
+
+
+def link_ids(text: str) -> str:
+    """Turn the brief's [ID] citations into clickable links, e.g. [NDA022271] -> [NDA022271](url)."""
+    def one(m):
+        parts = [p.strip() for p in re.split(r"[;,]", m.group(1))]
+        if not all(id_url(p) or re.fullmatch(r"\d{8}", p) for p in parts):
+            return m.group(0)  # not a citation (e.g. ordinary brackets): leave it
+        return "(" + ", ".join(f"[{p}]({id_url(p)})" if id_url(p) else f"DIN {p}" for p in parts) + ")"
+    text = re.sub(r"\]\s*\[", "; ", text)  # [A][B] -> [A; B], so one citation group reads as one list
+    return re.sub(r"\[([^\[\]]+)\](?!\()", one, text)
+
+
 def source_note(*parts: str) -> None:
     """A one-line, small-print source and freshness note under a page's title."""
     st.caption(" · ".join(p for p in parts if p))
