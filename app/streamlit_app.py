@@ -8,14 +8,22 @@ Reads only app/data/ (refresh it with: python scripts/build_app_data.py).
 
 import streamlit as st
 
-st.set_page_config(page_title="Obesity & T2D intel", page_icon="💊", layout="wide")
+import common as C
 
-PAGES = [
-    st.Page("views/home.py", title="Overview", icon="🏠", default=True),
-    st.Page("views/landscape.py", title="Landscape", icon="🧪"),
-    st.Page("views/changes.py", title="What changed", icon="📰"),
-    st.Page("views/segments.py", title="Who to target", icon="🎯"),
-    st.Page("views/call_list.py", title="Call list", icon="📇"),
-    st.Page("views/about.py", title="About the data", icon="ℹ️"),
-]
-st.navigation(PAGES).run()
+st.set_page_config(page_title="Obesity & T2D Intelligence", page_icon=":material/monitoring:", layout="wide")
+
+PAGES = {
+    "": [st.Page("views/home.py", title="Overview", icon=":material/dashboard:", default=True)],
+    "Market": [
+        st.Page("views/landscape.py", title="Landscape", icon=":material/science:"),
+        st.Page("views/changes.py", title="What changed", icon=":material/notifications:"),
+    ],
+    "Field force": [
+        st.Page("views/segments.py", title="Who to target", icon=":material/target:"),
+        st.Page("views/call_list.py", title="Call list", icon=":material/contact_page:"),
+    ],
+    "Reference": [st.Page("views/about.py", title="About the data", icon=":material/info:")],
+}
+page = st.navigation(PAGES)
+C.sidebar()
+page.run()

@@ -6,7 +6,7 @@ import streamlit as st
 import common as C
 
 m = C.meta()
-st.title(f"Who to target for {m['anchor_brand']}")
+C.page_header("Field force", f"Who to target for {m['anchor_brand']}", "Which prescribers the field force should call first, and the message for each group.")
 C.source_note(f"CMS Medicare Part D prescribers, {m['part_d_data_year']} data",
               f"{m['eligible']:,} prescribers with 50+ diabetes claims profiled",
               f"call capacity of {m['call_capacity']:,} is an assumption (~300 reps x 150 targets)")
@@ -24,12 +24,12 @@ with st.container(border=True):
         f"prescribe in the class (a list built on volume and adoption alone: "
         f"{m['baseline_pct_incretin_claims']}% and {m['baseline_pct_high_fit']}%).")
 k1, k2, k3, k4 = st.columns(4)
-k1.metric("Names in the call plan", f"{m['in_call_plan']:,}")
+k1.metric("Names in the call plan", f"{m['in_call_plan']:,}", border=True)
 k2.metric("GLP-1 claims reached", f"{m['plan_pct_incretin_claims']}%",
-          f"{m['plan_pct_incretin_claims'] - m['baseline_pct_incretin_claims']:+.1f} pts vs volume-only")
+          f"{m['plan_pct_incretin_claims'] - m['baseline_pct_incretin_claims']:+.1f} pts vs volume-only", border=True)
 k3.metric("Already in the class (high fit)", f"{m['plan_pct_high_fit']}%",
-          f"{m['plan_pct_high_fit'] - m['baseline_pct_high_fit']:+.1f} pts vs volume-only")
-k4.metric("Same names as the volume-only list", f"{100 * m['overlap_with_baseline'] / m['in_call_plan']:.0f}%")
+          f"{m['plan_pct_high_fit'] - m['baseline_pct_high_fit']:+.1f} pts vs volume-only", border=True)
+k4.metric("Overlap with volume-only list", f"{100 * m['overlap_with_baseline'] / m['in_call_plan']:.0f}%", border=True)
 
 # ---- targeting matrix ----
 st.subheader("The targeting matrix")
@@ -61,11 +61,14 @@ st.subheader("The segments")
 st.caption("Seven behaviour-based segments from k-means clustering on what each prescriber writes, "
            "plus a low-volume group. Sorted by how many names each puts in the call plan.")
 cards = C.table("segment_cards")
-FIT_ICON = {"High": "🟢 High fit", "Medium": "🟡 Medium fit", "Low": "⚪ Low fit"}
+FIT_BADGE = {"High": ("High launch fit", "green"), "Medium": ("Medium launch fit", "orange"),
+             "Low": ("Low launch fit", "gray")}
 cols = st.columns(2)
 for i, r in enumerate(cards.itertuples()):
     with cols[i % 2], st.container(border=True):
-        st.markdown(f"**{r.cluster}**  \n{FIT_ICON.get(r.launch_fit, 'Not profiled')}")
+        st.markdown(f"**{r.cluster}**")
+        label, colour = FIT_BADGE.get(r.launch_fit, ("Not profiled", "gray"))
+        st.badge(label, color=colour)
         a, b, c = st.columns(3)
         a.metric("Prescribers", f"{r.prescribers:,}")
         b.metric("Share of GLP-1 claims", f"{r.pct_of_incretin_claims}%")
@@ -105,4 +108,4 @@ st.caption("A low % means GLP-1 prescribing there is spread over many smaller pr
            "a case for inside sales and digital rather than more reps.")
 with st.expander("Table view, all states and territories"):
     st.dataframe(st_df, hide_index=True, width="stretch")
-st.page_link("views/call_list.py", label="Open the call list (filter and download)", icon="📇")
+st.page_link("views/call_list.py", label="Open the call list (filter and download)", icon=":material/contact_page:")

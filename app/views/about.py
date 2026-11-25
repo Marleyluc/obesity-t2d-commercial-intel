@@ -5,7 +5,7 @@ import streamlit as st
 import common as C
 
 m = C.meta()
-st.title("About the data")
+C.page_header("Reference", "About the data", "Sources, freshness, method and the limits to keep in mind.")
 st.markdown("Everything in this app comes from public sources, pulled and processed by the pipeline in this "
             "repository. The app itself never calls an API: it reads a small export built by "
             "`scripts/build_app_data.py`.")

@@ -1,5 +1,30 @@
+# Look and feel of the dashboard (Streamlit theme). Colours match the chart palette in app/common.py.
+
 [theme]
-primaryColor = "#257de0"
+base = "light"
+primaryColor = "#1b64be"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f4f6f9"
+textColor = "#1a2233"
+linkColor = "#1b64be"
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+baseFontSize = 15
+headingFontSizes = ["2.1rem", "1.35rem", "1.1rem"]
+headingFontWeights = [700, 650, 600]
+baseRadius = "0.6rem"
+borderColor = "#e2e6ec"
+showWidgetBorder = true
+dataframeHeaderBackgroundColor = "#f4f6f9"
+chartCategoricalColors = ["#257de0", "#f47230", "#00b894"]
+
+[theme.sidebar]
+backgroundColor = "#0f1f35"
+secondaryBackgroundColor = "#1a2d48"
+textColor = "#e8edf4"
+borderColor = "#22385a"
+
+[client]
+toolbarMode = "viewer"   # hides the developer "Deploy" menu from viewers
 
 [server]
 headless = true

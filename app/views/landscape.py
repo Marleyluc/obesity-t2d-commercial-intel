@@ -7,18 +7,18 @@ import streamlit as st
 import common as C
 
 m = C.meta()
-st.title("Competitive landscape")
+C.page_header("Market", "Competitive landscape", "Who is developing what in obesity and type 2 diabetes, how far along, and when results land.")
 C.source_note("Active, industry-sponsored interventional trials, Phase 1 to 3 (ClinicalTrials.gov, "
               f"{m['landscape_snapshot']})", "a trial testing two classes counts once in each")
 
 cp = C.table("landscape_class_phase").set_index("class")
 phases = ["Phase 1", "Phase 1/2", "Phase 2", "Phase 2/3", "Phase 3"]
 k1, k2, k3, k4 = st.columns(4)
-k1.metric("Pipeline trials (class x trial)", f"{int(cp['total'].sum()):,}")
-k2.metric("Late-stage (class x trial)", f"{int(cp[['Phase 2/3', 'Phase 3']].sum().sum()):,}")
+k1.metric("Pipeline trials (class x trial)", f"{int(cp['total'].sum()):,}", border=True)
+k2.metric("Late-stage (class x trial)", f"{int(cp[['Phase 2/3', 'Phase 3']].sum().sum()):,}", border=True)
 share = C.table("landscape_sponsor_share")
-k3.metric("Lilly + Novo share of late-stage", f"{share['share_pct'].head(2).sum():.0f}%")
-k4.metric("Readouts, next 18 months", f"{len(C.table('landscape_upcoming')):,}")
+k3.metric("Lilly + Novo share of late-stage", f"{share['share_pct'].head(2).sum():.0f}%", border=True)
+k4.metric("Readouts, next 18 months", f"{len(C.table('landscape_upcoming')):,}", border=True)
 
 # ---- class x phase ----
 st.subheader("Where the pipeline is crowded")

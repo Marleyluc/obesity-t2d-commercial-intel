@@ -9,7 +9,7 @@ Each milestone has an **exit criterion**: a concrete, checkable thing that must 
 | 3 | Landscape tracker | 🟡 Built; waiting on the change-log hand check after a second pull |
 | 4 | Prescriber segmentation | ✅ Done (2026-11-25) |
 | 5 | LLM "what changed" brief | 🟡 Built; first real brief 2026-11-25 (guardrail passed). Needs 3 weekly briefs in a row |
-| 6 | Streamlit dashboard | ⚪ Not started |
+| 6 | Streamlit dashboard | 🟡 Built and deployed (https://obesity-t2d-intel.streamlit.app, 2026-11-25); waiting on the 2-minute test |
 | 7 | Write-up & README | ⚪ Not started |
 
 ## Canada scope (added 2026-11-24)

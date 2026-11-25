@@ -57,3 +57,13 @@ grid-based list; 65.9% vs 54.5% are high launch fit).
 | **Speed check:** each page renders in 0.2-0.8 s in Streamlit's test runner (cold, in the cloud sandbox), against the < 5 s target; the smoke tests fail if any page takes over 5 s. | The exit criterion, checked by a test rather than by eye. | The browser adds network time when deployed. |
 | **`app/requirements.txt` lists only what the app needs** (streamlit, pandas, pyarrow, plotly), pinned to the versions tested. | Streamlit Community Cloud installs from the entry file's folder first; a short list builds faster and avoids installing the whole pipeline. | Update the pins when you upgrade locally. |
 | **Deployed on Streamlit Community Cloud from `main`, entry file `app/streamlit_app.py`.** | Free and connected to GitHub: each push redeploys. | Free-tier apps sleep after inactivity and take ~30 s to wake. Treated as internal in the write-up; the link itself is public unless restricted in the app's sharing settings. |
+
+## Design pass (2026-11-25)
+
+| Decision | Why | Cost |
+|---|---|---|
+| **A theme in `.streamlit/config.toml`:** Inter font, navy sidebar, one blue accent shared with the charts, rounded bordered cards, softer table headers. | Reads as a product rather than a notebook; one accent colour keeps charts and UI consistent. | Inter loads from Google Fonts; without internet the app falls back to the system font. |
+| **Navigation grouped (Market, Field force, Reference) with Material icons instead of emoji.** | Mirrors how a brand team thinks about the questions, and looks like enterprise software. | None. |
+| **Every page opens with a section label, title and one-line purpose; headline numbers sit in bordered KPI cards.** | Consistent page anatomy: the reader always knows where they are and what the page answers. | None. |
+| **One Plotly template for all charts** (font, muted axes, hover style). | Charts match the app instead of Plotly's defaults. | None. |
+| **The developer "Deploy" menu is hidden from viewers** (`client.toolbarMode = "viewer"`). | Viewers of an internal tool shouldn't see developer controls. | Run locally with `--client.toolbarMode developer` if you need them. |

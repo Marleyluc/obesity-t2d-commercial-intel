@@ -5,7 +5,7 @@ import streamlit as st
 import common as C
 
 m = C.meta()
-st.title("Call list")
+C.page_header("Field force", "Call list", "The prescriber-level targets behind the recommendation: filter, look up, download.")
 C.source_note(f"CMS Medicare Part D, {m['part_d_data_year']} data", "Tier 1-3 prescribers only",
               "names are left out; look up an NPI in the national registry")
 
@@ -33,9 +33,9 @@ if npi:
     v = v[v["npi"].str.startswith(npi.strip())]
 
 k1, k2, k3 = st.columns(3)
-k1.metric("Prescribers shown", f"{len(v):,}")
-k2.metric("Their GLP-1 claims", f"{int(v['incretin_claims'].sum()):,}")
-k3.metric("Their diabetes claims", f"{int(v['total_claims'].sum()):,}")
+k1.metric("Prescribers shown", f"{len(v):,}", border=True)
+k2.metric("Their GLP-1 claims", f"{int(v['incretin_claims'].sum()):,}", border=True)
+k3.metric("Their diabetes claims", f"{int(v['total_claims'].sum()):,}", border=True)
 
 v = v.assign(registry=v["npi"].map(C.NPI_REGISTRY.format))
 st.dataframe(

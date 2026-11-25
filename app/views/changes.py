@@ -7,7 +7,7 @@ import streamlit as st
 import common as C
 
 m = C.meta()
-st.title("What changed this week")
+C.page_header("Market", "What changed this week", "New approvals, label changes and trial moves since the last pull, with an analyst-style brief.")
 log = C.table("changes") if (C.DATA / "changes.parquet").exists() else None
 if log is None or log.empty:
     st.info("No change log yet: run a second pull, then scripts/build_changes.py and scripts/build_app_data.py.")
@@ -20,14 +20,14 @@ C.source_note(f"Snapshots compared: {period}", "ClinicalTrials.gov, FDA (Drugs@F
 
 housekeeping = {"Primary label source changed", "No longer returned"}
 k1, k2, k3, k4 = st.columns(4)
-k1.metric("Changes found", len(log))
-k2.metric("High importance", int((log["importance"] == "high").sum()))
-k3.metric("Medium importance", int((log["importance"] == "medium").sum()))
+k1.metric("Changes found", len(log), border=True)
+k2.metric("High importance", int((log["importance"] == "high").sum()), border=True)
+k3.metric("Medium importance", int((log["importance"] == "medium").sum()), border=True)
 k4.metric("Held for a human check", int(log["change_type"].isin(housekeeping).sum()),
           help="Pipeline housekeeping (e.g. our label search changed which document it uses). "
-               "Never sent to the brief until a person has checked it.")
+               "Never sent to the brief until a person has checked it.", border=True)
 
-tab_brief, tab_log = st.tabs(["📝 The brief", "📋 All changes"])
+tab_brief, tab_log = st.tabs([":material/description: The brief", ":material/table_rows: All changes"])
 
 with tab_brief:
     text = C.brief()
@@ -35,7 +35,8 @@ with tab_brief:
         st.info("No brief yet: run scripts/build_brief.py, then scripts/build_app_data.py.")
     else:
         body = text.split("\n", 1)[1] if text.startswith("# ") else text  # the page already has a title
-        body = body.replace("\n## ", "\n#### ")  # section headings sized for a panel, not a page
+        body = body.replace("\n## ", "\n##### ")  # section headings sized for a panel, not a page
+        body = "\n".join(ln for ln in body.splitlines() if not ln.startswith("*Obesity and T2D landscape brief"))
         with st.container(border=True):
             st.markdown(C.link_ids(body))
         st.caption("Every [ID] links to its source record. The brief was written by an LLM that saw only "

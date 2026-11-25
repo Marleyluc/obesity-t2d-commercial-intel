@@ -10,6 +10,8 @@ import re
 from pathlib import Path
 
 import pandas as pd
+import plotly.graph_objects as go
+import plotly.io as pio
 import streamlit as st
 
 DATA = Path(__file__).parent / "data"
@@ -71,6 +73,35 @@ def link_ids(text: str) -> str:
         return "(" + ", ".join(f"[{p}]({id_url(p)})" if id_url(p) else f"DIN {p}" for p in parts) + ")"
     text = re.sub(r"\]\s*\[", "; ", text)  # [A][B] -> [A; B], so one citation group reads as one list
     return re.sub(r"\[([^\[\]]+)\](?!\()", one, text)
+
+
+# One quiet Plotly look for every chart: the app's font, muted axis text, no chart titles.
+pio.templates["ci"] = go.layout.Template(layout=dict(
+    font=dict(family="Inter, system-ui, -apple-system, Segoe UI, sans-serif", size=13, color="#3b4557"),
+    colorway=SERIES, hoverlabel=dict(font_size=13, bgcolor="white", bordercolor="#e2e6ec"),
+    xaxis=dict(tickfont=dict(color="#5b6578")), yaxis=dict(tickfont=dict(color="#5b6578"))))
+pio.templates.default = "plotly_white+ci"
+
+
+def sidebar() -> None:
+    """Product name and data freshness, shown under the navigation on every page."""
+    m = meta()
+    with st.sidebar:
+        st.markdown("**Obesity & T2D Intelligence**  \n"
+                    f"<span style='opacity:.7;font-size:.85rem'>Internal · {m['anchor_brand']} brand team</span>",
+                    unsafe_allow_html=True)
+        st.caption(f"Trials {m['landscape_snapshot']} · Brief {m['brief']} · "
+                   f"Part D {m['part_d_data_year']}")
+
+
+def page_header(eyebrow: str, title: str, subtitle: str = "") -> None:
+    """Small coloured section label, the page title, and a one-line subtitle."""
+    st.markdown(f"<div style='color:#1b64be;font-weight:600;font-size:.8rem;letter-spacing:.08em;"
+                f"text-transform:uppercase;margin-bottom:-.6rem'>{eyebrow}</div>", unsafe_allow_html=True)
+    st.title(title)
+    if subtitle:
+        st.markdown(f"<div style='color:#5b6578;font-size:1.02rem;margin:-.4rem 0 .6rem'>{subtitle}</div>",
+                    unsafe_allow_html=True)
 
 
 def source_note(*parts: str) -> None:
