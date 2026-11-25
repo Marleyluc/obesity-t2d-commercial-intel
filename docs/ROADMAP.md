@@ -4,8 +4,8 @@ Each milestone has an **exit criterion**: a concrete, checkable thing that must 
 
 | # | Milestone | Status |
 |---|-----------|--------|
-| 1 | Setup | 🟡 In progress |
-| 2 | Data acquisition | ⚪ Not started |
+| 1 | Setup | ✅ Done (2026-11-24) |
+| 2 | Data acquisition | ✅ Done (2026-11-24) |
 | 3 | Landscape tracker | ⚪ Not started |
 | 4 | Prescriber segmentation | ⚪ Not started |
 | 5 | LLM "what changed" brief | ⚪ Not started |

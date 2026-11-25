@@ -100,6 +100,7 @@ Written during Milestone 2, from the first pulls on 24–25 Nov 2026 (snapshot f
 1. **Medicare only.** Mostly people 65+ and people with disabilities. Not the commercial or Medicaid market, and nothing for Canada.
 2. **About a two-year lag.** 2024 prescribing, before orforglipron, efsitora, icodec and generic-semaglutide events.
 3. **Small counts suppressed.** CMS removes any prescriber × drug row with fewer than 11 claims, so low-volume prescribers and new launches are undercounted. That biases "early adopter" signals downward.
+   *Measured (reconciliation against CMS's national totals, `scripts/check_partd_totals.py`):* our file holds **85% of all national claims** for the matched drugs (115.6M of 135.6M). Big drugs are well covered (metformin 97%, Ozempic 95%, Jardiance 94%, Mounjaro 92%), older drugs written by many occasional prescribers less so (Januvia 87%, glipizide 87%), and drugs with few or occasional prescribers least (Rybelsus 72%, Wegovy 36%). 32 tiny items (mostly insulin syringes, pens and pods, under 1,300 claims each nationally) are fully suppressed. No drug exceeds its national total, so nothing is double counted.
 4. **Weight-loss drugs excluded by law.** In 2024 Medicare: Ozempic 9.9M claims vs Wegovy 76k, Zepbound 14 and Contrave 220. So **the segmentation is really a type 2 diabetes / cardiometabolic segmentation**, and must be described that way.
 
 **Issues found (to handle in M4 mapping)**
@@ -112,9 +113,9 @@ Written during Milestone 2, from the first pulls on 24–25 Nov 2026 (snapshot f
 ---
 
 ## Open items carried into M3/M4
-- [ ] Reconcile Part D filtered totals against CMS's published summary for a few drugs (M2 exit criterion, not yet done).
+- [x] Reconcile Part D filtered totals against CMS's published national totals (done 2026-11-24: passed, 85% captured overall; see section 5).
 - [ ] Decode ODB coverage attributes from the XSD before labelling them.
 - [ ] Confirm the zero-label brands are discontinued.
 - [ ] Decide the treatment of trials with no phase or `NA`.
 - [ ] Define "Canada lag" precisely (US approval → first Canadian market date).
-- [ ] Map CMS generic names to config molecules explicitly (drop over-matches, fix NPH).
+- [ ] Map CMS generic names to config molecules explicitly (drop over-matches, fix NPH), and drop insulin devices such as syringes, pens and pods).

@@ -28,6 +28,9 @@ sources:
   cms_partd:
     catalog_url: https://data.cms.gov/data.json
     dataset_title: "Medicare Part D Prescribers - by Provider and Drug"
+    # Reference for the M2 check (scripts/check_partd_totals.py): its National rows give
+    # CMS's own total claims per drug, including the small prescribers suppressed above.
+    geo_dataset_title: "Medicare Part D Prescribers - by Geography and Drug"
     # null = use the latest year in the catalogue. Part D prescriber data lags roughly two
     # years (e.g. 2024 data is published in 2026). Set a year (e.g. 2023) to pin one.
     data_year: null
