@@ -36,3 +36,7 @@ Thumbs.db
 
 # Briefs the ID guardrail rejected (kept locally for review, not published)
 briefs/*.rejected.md
+
+# The dashboard's small data export IS committed (M6): the deployed app reads it
+!app/data/
+!app/data/*.parquet

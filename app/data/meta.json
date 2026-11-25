@@ -1,0 +1,26 @@
+{
+  "built_at": "2026-11-25 15:55 UTC",
+  "landscape_snapshot": "2026-11-24",
+  "change_log": "2026-11-25",
+  "brief": "2026-11-25",
+  "part_d_snapshot": "2026-11-24",
+  "part_d_data_year": 2024,
+  "anchor_brand": "orforglipron",
+  "call_capacity": 45000,
+  "prescribers": 316495,
+  "eligible": 229476,
+  "in_call_plan": 45000,
+  "plan_pct_incretin_claims": 61.9,
+  "baseline_pct_incretin_claims": 60.5,
+  "plan_pct_high_fit": 65.9,
+  "baseline_pct_high_fit": 54.5,
+  "overlap_with_baseline": 39024,
+  "plan_by_segment": {
+    "Injectable GLP-1 adopters (Ozempic / Trulicity)": 20856,
+    "Insulin-intensive": 7854,
+    "Tirzepatide-led (Mounjaro)": 5683,
+    "Generic-first (metformin / sulfonylurea)": 4399,
+    "Oral GLP-1 users (Rybelsus)": 3105,
+    "DPP-4 loyal": 3103
+  }
+}
