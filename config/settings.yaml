@@ -28,9 +28,12 @@ sources:
   cms_partd:
     catalog_url: https://data.cms.gov/data.json
     dataset_title: "Medicare Part D Prescribers - by Provider and Drug"
-    # Filled in during Milestone 2 after checking which year is the latest release.
-    # Part D prescriber data lags roughly two years (e.g. 2024 data is published in 2026).
+    # null = use the latest year in the catalogue. Part D prescriber data lags roughly two
+    # years (e.g. 2024 data is published in 2026). Set a year (e.g. 2023) to pin one.
     data_year: null
+    # The full national file is several GB. After filtering it to our drugs with DuckDB we
+    # delete it (it is an immutable annual release we can re-download), unless --keep-csv.
+    keep_full_csv: false
 
   # --- Canada (market access layer; there is no public Canadian prescriber-level data) ---
   hc_dpd:

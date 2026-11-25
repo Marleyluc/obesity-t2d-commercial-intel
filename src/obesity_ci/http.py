@@ -35,6 +35,12 @@ class PoliteSession:
         self.session.headers["User-Agent"] = st["user_agent"]
         self.session.mount("https://", HTTPAdapter(max_retries=retry))
 
+    def content_length(self, url: str) -> int | None:
+        """Size of a file in bytes before downloading it (None if the server doesn't say)."""
+        r = self.session.head(url, allow_redirects=True, timeout=self.timeout)
+        size = r.headers.get("Content-Length")
+        return int(size) if r.ok and size and size.isdigit() else None
+
     def get_json(self, url: str, params: dict | None = None, none_on_404: bool = False) -> dict | None:
         """GET a URL and return parsed JSON. Raises a readable error on failure.
 
@@ -52,7 +58,7 @@ class PoliteSession:
             raise RuntimeError(f"HTTP {r.status_code} for {r.url}\nServer said: {r.text[:500]}")
         return r.json()
 
-    def download(self, url: str, dest) -> int:
+    def download(self, url: str, dest, progress: bool = False) -> int:
         """Stream a (possibly large) file to disk without loading it into memory. Returns bytes written."""
         wait = self.delay_s - (time.monotonic() - self._last_call)
         if wait > 0:
@@ -66,4 +72,6 @@ class PoliteSession:
                 for chunk in r.iter_content(chunk_size=1 << 20):
                     f.write(chunk)
                     n += len(chunk)
+                    if progress and n % (250 << 20) < len(chunk):
+                        print(f"  ... {n / 1e9:.2f} GB downloaded", flush=True)
         return n
