@@ -34,3 +34,15 @@ Not sent: 9 "Primary label source changed" rows, the expected one-off effect of 
 | **A week with nothing to send gets a brief written by code, with no API call.** | Quiet weeks are real (CT.gov had 0 changes on 2026-11-25), and they shouldn't cost money or invite the model to fill space. | None. |
 | **The client is passed in; tests use a fake one.** | Tests run offline, for free, and check the exact request we send (model, effort, fallback, that housekeeping rows never reach the model). | The fake can't catch a change in the real API; the real run in chunk 4 does. |
 | **SDK pinned at `anthropic>=2.14`.** | The `fallbacks` and `output_config` parameters need a recent SDK. | None (2.14 is already installed). |
+
+## Chunk 3: the ID guardrail (`src/obesity_ci/brief/guardrail.py`)
+
+| Decision | Why | Cost |
+|---|---|---|
+| **Any ID-shaped token in the model's text (NCT number, NDA/BLA/ANDA number, 8-digit DIN) must be one we sent**, inside brackets or not. | An unknown ID is the clearest sign the model used memory instead of our change log. Checking outside the brackets catches "mirrors Ozempic's NDA 209637" too. | A real 8-digit number that isn't a DIN would be flagged; none should appear in a brief. |
+| **Every [bracketed] citation must be a sent ID**, so "[Nesina label]" or a garbled "[NCT0123]" fails. | A citation you can't look up isn't a citation. | None. |
+| **Every line that says something must carry at least one citation**, except "Nothing this week." | Puts "cites an ID for every claim" into code, so we don't depend on the model obeying. | Checked per line, not per sentence: a line with two sentences and one citation passes. A reviewer still reads the brief. |
+| **The five headings must be there, exactly and in order.** | Keeps briefs comparable week to week, and the dashboard (M6) can split them by section. | None. |
+| **One retry, with the problems listed in the request; a second failure saves nothing** and writes the draft to `briefs/<date>.rejected.md`. | Most slips are fixed when the model is told exactly what was wrong. Refusing to save after that means a bad brief can't quietly go out. The rejected draft shows a human what went wrong. | A retry doubles that week's cost (both calls are counted in the token log). |
+| **The footer records the check:** how many distinct IDs were cited and whether it took a retry. | A reader can see the brief was checked, without opening the code. | None. |
+| **What the guardrail can't catch:** a wrong claim with a right ID (e.g. calling a labeling change an approval). | That needs a human or a second model reading each sentence against its row. Out of scope for M5; the input file next to each brief makes the human check quick. | Stated as a limitation in the write-up. |

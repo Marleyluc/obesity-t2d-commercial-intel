@@ -14,7 +14,9 @@ How it works:
 4. A week with nothing to send gets a short brief written by code, with no API call.
 
 The client is passed in, so tests use a fake one and never call the API (see
-tests/test_brief_generate.py). Chunk 3 adds the ID guardrail between generating and saving.
+tests/test_brief_generate.py). Between generating and saving, the ID guardrail (guardrail.py,
+chunk 3) checks the draft; a failing draft gets one retry, and a second failure saves nothing as
+the brief (the draft goes to briefs/<date>.rejected.md for a human to look at).
 """
 
 from __future__ import annotations
@@ -23,6 +25,7 @@ import json
 from pathlib import Path
 
 from obesity_ci import config
+from obesity_ci.brief import guardrail, inputs
 
 MODEL = "claude-opus-5-5"
 EFFORT = "medium"  # the model's default, set explicitly so a default change can't surprise us
@@ -114,8 +117,12 @@ def default_client():
     return anthropic.Anthropic(api_key=key)
 
 
-def call_model(brief_input: dict, client, anchor: dict) -> dict:
-    """One API call. Returns the brief body plus what we need to log (model, tokens)."""
+def call_model(brief_input: dict, client, anchor: dict, retry_note: str = "") -> dict:
+    """One API call. Returns the brief body plus what we need to log (model, tokens).
+
+    retry_note: on a retry, the guardrail's list of what was wrong with the first draft.
+    """
+    content = user_prompt(brief_input, anchor) + (f"\n\n{retry_note}" if retry_note else "")
     response = client.beta.messages.create(
         model=MODEL,
         max_tokens=MAX_TOKENS,
@@ -124,7 +131,7 @@ def call_model(brief_input: dict, client, anchor: dict) -> dict:
         thinking={"type": "adaptive"},
         output_config={"effort": EFFORT},
         system=system_prompt(anchor["molecule"]),
-        messages=[{"role": "user", "content": user_prompt(brief_input, anchor)}],
+        messages=[{"role": "user", "content": content}],
     )
     # Check why the model stopped BEFORE reading the text.
     if response.stop_reason == "refusal":
@@ -163,7 +170,13 @@ def render(brief_input: dict, body: str, meta: dict) -> str:
     if o["over_row_limit"]:
         left_out.append(f"- {o['over_row_limit']} changes over the row limit.")
     footer = "## Not covered in this brief\n\n" + ("\n".join(left_out) or "- Nothing was left out.")
-    footer += f"\n\n*Written by {meta['model']}*" if meta.get("model") else "\n\n*No changes to send; written by code.*"
+    if meta.get("model"):
+        g = meta.get("guardrail", {})
+        checked = (f" ID check passed: {g['citations']} distinct IDs cited, all from the input"
+                   f"{' (on the retry)' if g.get('attempts') == 2 else ''}." if g else "")
+        footer += f"\n\n*Written by {meta['model']}.{checked}*"
+    else:
+        footer += "\n\n*No changes to send; written by code.*"
     return f"{header}\n\n{body}\n\n{footer}\n"
 
 
@@ -176,15 +189,39 @@ def input_path(date: str | None = None) -> Path:
     return files[-1]
 
 
+def guarded_call(brief_input: dict, client, anchor: dict, out: Path) -> dict:
+    """Generate, check, retry once if needed. Raises BriefError if both drafts fail."""
+    allowed, heads = inputs.allowed_ids(brief_input), headings(anchor["molecule"])
+    meta = call_model(brief_input, client, anchor)
+    problems = guardrail.check(meta["body"], allowed, heads)
+    attempts = 1
+    if problems:
+        first = meta
+        meta = call_model(brief_input, client, anchor, retry_note=guardrail.feedback(problems))
+        meta["input_tokens"] += first["input_tokens"]
+        meta["output_tokens"] += first["output_tokens"]
+        problems = guardrail.check(meta["body"], allowed, heads)
+        attempts = 2
+    if problems:
+        rejected = out.with_name(out.name.replace(".md", ".rejected.md"))
+        rejected.write_text("<!-- REJECTED by the ID guardrail; not a brief.\n- " + "\n- ".join(problems)
+                            + "\n-->\n\n" + meta["body"] + "\n", encoding="utf-8")
+        raise BriefError("The brief failed the ID guardrail twice, so it was not saved:\n- "
+                         + "\n- ".join(problems) + f"\nThe last draft is in {rejected} for review.")
+    out.with_name(out.name.replace(".md", ".rejected.md")).unlink(missing_ok=True)  # stale reject
+    meta["guardrail"] = {"attempts": attempts, "citations": len(guardrail.cited_ids(meta["body"]))}
+    return meta
+
+
 def run(date: str | None = None, client=None) -> dict:
     src = input_path(date)
     brief_input = json.loads(src.read_text(encoding="utf-8"))
     anchor = anchor_context()
+    out = src.with_name(src.name.replace(".input.json", ".md"))
     if brief_input["changes"]:
-        meta = call_model(brief_input, client or default_client(), anchor)
+        meta = guarded_call(brief_input, client or default_client(), anchor, out)
     else:
         meta = {"body": empty_body(anchor["molecule"]), "model": None}
     md = render(brief_input, meta["body"], meta)
-    out = src.with_name(src.name.replace(".input.json", ".md"))
     out.write_text(md, encoding="utf-8")
     return {"input": src, "out": out, "brief": md, **{k: v for k, v in meta.items() if k != "body"}}

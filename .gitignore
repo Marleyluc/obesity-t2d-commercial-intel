@@ -33,3 +33,6 @@ venv/
 Thumbs.db
 .vscode/
 .idea/
+
+# Briefs the ID guardrail rejected (kept locally for review, not published)
+briefs/*.rejected.md
