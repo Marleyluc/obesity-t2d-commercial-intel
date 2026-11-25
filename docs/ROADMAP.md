@@ -6,8 +6,8 @@ Each milestone has an **exit criterion**: a concrete, checkable thing that must 
 |---|-----------|--------|
 | 1 | Setup | ✅ Done (2026-11-24) |
 | 2 | Data acquisition | ✅ Done (2026-11-24) |
-| 3 | Landscape tracker | ⚪ Not started |
-| 4 | Prescriber segmentation | ⚪ Not started |
+| 3 | Landscape tracker | 🟡 Built; waiting on the change-log hand check after a second pull |
+| 4 | Prescriber segmentation | ✅ Done (2026-11-25) |
 | 5 | LLM "what changed" brief | ⚪ Not started |
 | 6 | Streamlit dashboard | ⚪ Not started |
 | 7 | Write-up & README | ⚪ Not started |
@@ -73,7 +73,7 @@ Canada view: approval lag vs. FDA and the reimbursement funnel (approved → CDA
 **Goal:** cluster Medicare Part D prescribers by behaviour and translate clusters into a targeting recommendation.
 
 Deliverables
-- Prescriber-level feature table: total claims in scope, class mix shares, newer-agent share (GLP-1 / GIP-GLP-1 / SGLT2 vs. legacy agents), specialty, state / urban-rural, beneficiary counts
+- Prescriber-level feature table: total claims in scope, class mix shares, newer-agent share (GLP-1 / GIP-GLP-1 / SGLT2 vs. legacy agents), specialty, state / urban-rural, beneficiary counts (urban-rural not done: needs the Part D "by Provider" file; see docs/M4_DECISIONS.md)
 - Clustering (k-means on scaled features, with k chosen by silhouette + business interpretability; compare with a simple rules-based decile segmentation as a baseline)
 - Segment profiles and a targeting matrix (value vs. opportunity)
 

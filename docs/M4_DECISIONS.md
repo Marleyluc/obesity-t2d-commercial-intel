@@ -62,3 +62,74 @@ in-scope claims and 64% of incretin claims; 38% of them already write Rybelsus. 
 (24% of incretin claims); C = 110,838 (10.5%). The "Low value / Low adoption" cell is 40% SGLT2,
 which is the cardiology/nephrology group the grid can't tell apart from small generic prescribers:
 one reason to try clustering in chunk 4.
+
+## Chunk 4: behavioural clusters (`src/obesity_ci/segment/clusters.py`)
+
+| Decision | Why | Cost |
+|---|---|---|
+| **Cluster on the 7 class-mix shares only** (standardised), not volume. | The grid already ranks by volume. Clustering on mix answers a different question, "what kind of prescriber is this?", and chunk 5 crosses it with value. | Two prescribers with the same mix but 10x different volume land in the same cluster (by design). |
+| **k-means, k = 7.** Scan of k = 3..10: silhouette peaks at k = 6 (0.275); k = 7 is 0.266 with stability 0.984 (k = 4 and 10 are unstable, ~0.8 and 0.5). | k = 7 splits GLP-1 users into Ozempic/Trulicity-led and Mounjaro-led, the distinction a Lilly launch needs; the separation cost is small. | Silhouette ~0.27 means real but overlapping groups: prescribers sit on a continuum, so cluster edges are soft. Said wherever clusters are shown. |
+| **Stability = adjusted Rand index between the reference fit and 5 refits on bootstrap samples with new seeds.** | Directly tests the exit criterion "segments are stable". | Tests stability to sampling, not to a new data year (check that with 2025 data). |
+| **Clusters are named from their most distinctive feature** (highest centre z-score). | Names don't depend on k-means' arbitrary label numbers, so they're reproducible run to run. | A name summarises a tendency: "Generic-first" prescribers still write 10% incretin on average. |
+| **Low-volume prescribers keep the label "Low volume (not profiled)".** | Same rule as chunk 3. | None. |
+
+**Result on real data (2024):** silhouette 0.266; stability mean ARI 0.981 (min 0.970): PASS.
+Agreement with the baseline grid is low (ARI 0.104), so the clusters add information.
+The seven groups: Generic-first (70k prescribers, 26% of claims), Injectable GLP-1 adopters
+(61k, 36% of incretin claims), Insulin-intensive (24k, 16% endocrinologists), DPP-4 loyal (28k),
+Tirzepatide-led (18k, Lilly = 65% of their incretin claims), Oral GLP-1 users (10k, all write
+Rybelsus), SGLT2 cardiorenal (18k, 95% SGLT2, mostly cardiology/nephrology).
+
+**What the grid misses (corrected in chunk 5):** half of the Tirzepatide-led (9,339) and a third of
+the Oral GLP-1 users (3,524) are in baseline priority C. Chunk 5 showed these are almost all
+*low-volume* prescribers (Tirzepatide-led in C: median 102 claims, 2.5% of GLP-1 claims), so they
+rightly stay off the rep call list. The clusters' real contribution is the prescribing *style*:
+it changes about 6,000 names on a 45,000-name call plan and, above all, the message to each group.
+
+## Chunk 5: targeting recommendation (`src/obesity_ci/segment/targeting.py`)
+
+| Decision | Why | Cost |
+|---|---|---|
+| **Targeting matrix = value tier (chunk 3) x launch fit (from the cluster, chunk 4).** | Value says how much a prescriber matters; launch fit says how easy the orforglipron conversation is. Together they are the classic "value vs opportunity" matrix. | Opportunity is inferred from 2024 behaviour, not measured intent. |
+| **Launch fit per cluster is a written judgement:** High = oral GLP-1 users, Tirzepatide-led, injectable GLP-1 adopters; Medium = DPP-4 loyal, generic-first, insulin-intensive; Low = SGLT2 cardiorenal. | Prescribers already in the class adopt a new option fastest; pill-first non-users are a slower class-conversion sell; cardiorenal specialists are a different conversation. Written in code so it can be challenged. | A different launch (e.g. an injectable) would rate the clusters differently. |
+| **Tiers:** 1 = High value x High fit; 2 = High x Medium or Medium x High; 3 = Medium x Medium or Low x High; 4 = everything else. Each tier has one channel action. | Simple enough for a brand lead to remember and defend. | Tier edges are hard cut-offs. |
+| **Call plan capacity = 45,000 prescribers** (assumed ~300 reps x ~150 targets), filled by tier, then by incretin claims. | A target list longer than the field force can reach isn't a plan. | The size is an assumption (`CALL_CAPACITY`); real field forces for a major launch range widely. |
+| **The plan is compared with the same-size list from the baseline grid.** | To show honestly what the clustering adds. | None. |
+| **Segment cards:** each cluster has a name, one-line description, size, tier counts and a recommended action and message. | The M4 exit criterion; also what goes on the dashboard. | Messages are illustrative brand thinking, not tested claims; orforglipron vs Rybelsus wording would need medical/legal review. |
+
+**Result on real data (2024):** Tier 1 = 25,570 prescribers (32% of GLP-1 claims), all in the call plan;
+the remaining 19,430 call slots go to the top of Tier 2 (72,323 prescribers). The 45,000-prescriber
+call plan reaches **61.9% of GLP-1 claims** and 47.7% of all in-scope claims: 28.8k primary care
+physicians, 10.5k NPs/PAs, 4.5k endocrinologists.
+
+**What the clusters add, honestly:** a grid-based list of the same size reaches 60.5% of GLP-1
+claims, and 39,024 prescribers (87%) are on both lists. So the clusters don't change *who* much.
+They raise the share of the list already prescribing in the class from 54% to 66% (swapping about
+6,000 generic-first, DPP-4 and cardiorenal prescribers for GLP-1, Mounjaro and Rybelsus users),
+and they give each group its own message, which the grid can't.
+
+## Data limitations (exit criterion)
+
+1. **Medicare Part D only**, mostly people aged 65+. Commercially insured and Medicaid patients
+   (most new GLP-1 use in younger adults) are not here, so the targeting is for the Medicare book.
+   Commercial prescribing could rank prescribers differently.
+2. **2024 data, before orforglipron launched (April 2026).** The targeting uses analogue behaviour
+   (GLP-1 and oral GLP-1 use), not actual orforglipron uptake.
+3. **Weight-loss-only drugs are largely excluded from Part D**, so this is a T2D / cardiometabolic
+   segmentation. Obesity-focused prescribers (e.g. Zepbound and Wegovy for weight) are invisible.
+4. **Rows under 11 claims are hidden by CMS.** A prescriber's occasional use of a drug disappears,
+   which makes small-volume behaviour look more concentrated, and makes early adopters of new
+   drugs look like non-users.
+5. **Claims, not patients or outcomes.** 90-day fills count as one claim; patient counts are a floor.
+6. **No access or payer information:** formulary status, prior-authorisation burden and rep access
+   ("no-see" offices) all drive real targeting and are not in this data.
+7. **Rural/urban not included.** The ROADMAP listed it; it needs the Part D "by Provider" file
+   (prescriber ZIP and RUCA code), a possible later addition.
+8. **Clusters overlap** (silhouette 0.27): prescribers sit on a spectrum, so segment edges are soft.
+   Stable to resampling (adjusted Rand 0.98), but not yet tested on a second data year.
+9. **Launch-fit ratings, tier rules and the 45,000 call capacity are judgements or assumptions**,
+   stated in the code, not estimated from response data.
+
+**Exit criteria check (2026-11-25):** stable segments (bootstrap adjusted Rand 0.981, PASS); every
+segment has a name, description, size and recommended action (`segment_cards.csv`); limitations
+written up (above). M4 done.
