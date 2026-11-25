@@ -15,6 +15,7 @@ import plotly.io as pio
 import streamlit as st
 
 DATA = Path(__file__).parent / "data"
+LOGO = Path(__file__).parent / "assets" / "logo.svg"
 
 # Colours: a validated colour-blind-safe categorical order (blue, orange, aqua) and a one-hue blue
 # ramp for magnitude (heatmaps, maps). Grey is for "everything else".
@@ -83,25 +84,102 @@ pio.templates["ci"] = go.layout.Template(layout=dict(
 pio.templates.default = "plotly_white+ci"
 
 
-def sidebar() -> None:
-    """Product name and data freshness, shown under the navigation on every page."""
+REPO = "https://github.com/Marleyluc/obesity-t2d-commercial-intel"
+
+CSS = """
+<style>
+/* ---- page frame: centred content, like a website ---- */
+[data-testid="stMainBlockContainer"] {max-width: 1240px; padding-top: 4.2rem; padding-bottom: 2rem;}
+[data-testid="stHeader"] {background: rgba(255,255,255,.92); backdrop-filter: blur(8px);
+  border-bottom: 1px solid #e2e6ec;}
+footer {visibility: hidden;}
+
+/* ---- hero band ---- */
+.ci-hero {background: linear-gradient(120deg, #0f1f35 0%, #163a6b 55%, #1b64be 100%); color: #fff;
+  border-radius: 18px; padding: 2.2rem 2.4rem; margin: .4rem 0 1.4rem; position: relative; overflow: hidden;}
+.ci-hero:after {content: ""; position: absolute; right: -80px; top: -80px; width: 320px; height: 320px;
+  border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.16), rgba(255,255,255,0) 70%);}
+.ci-hero .eyebrow {font-size: .78rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: #9dc8f7;}
+.ci-hero h1 {color: #fff; font-size: 2.3rem; font-weight: 700; line-height: 1.15; margin: .35rem 0 .5rem;
+  padding: 0;}
+.ci-hero.small h1 {font-size: 1.9rem;}
+.ci-hero p {color: #d6e4f5; font-size: 1.05rem; max-width: 760px; margin: 0;}
+.ci-chips {margin-top: 1.1rem; display: flex; flex-wrap: wrap; gap: .5rem;}
+.ci-chip {background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); color: #eef4fb;
+  border-radius: 999px; padding: .22rem .75rem; font-size: .8rem;}
+
+/* ---- KPI tiles (st.metric with border) ---- */
+[data-testid="stMetric"] {background: #fff; box-shadow: 0 1px 2px rgba(16,24,40,.05), 0 4px 12px rgba(16,24,40,.04);
+  border-top: 3px solid #1b64be !important;}
+[data-testid="stMetricLabel"] p {font-size: .78rem !important; font-weight: 600; letter-spacing: .04em;
+  text-transform: uppercase; color: #5b6578;}
+[data-testid="stMetricValue"] {font-weight: 650; letter-spacing: -.01em;}
+[data-testid="stColumn"] [data-testid="stMetric"] {min-height: 8.1rem;}
+/* metrics inside cards are plain numbers, not tiles */
+[class*="st-key-card"] [data-testid="stMetric"] {box-shadow: none; border-top: none !important; border: none !important;
+  background: transparent; padding-left: 0; min-height: 0;}
+
+/* ---- cards: st.container(border=True, key="card-...") ---- */
+[class*="st-key-card"] {background: #fff; box-shadow: 0 1px 2px rgba(16,24,40,.05), 0 6px 16px rgba(16,24,40,.05);
+  transition: box-shadow .15s ease, transform .15s ease;}
+[class*="st-key-card"]:hover {box-shadow: 0 2px 4px rgba(16,24,40,.06), 0 12px 28px rgba(16,24,40,.09);
+  transform: translateY(-1px);}
+
+/* ---- section headings ---- */
+.ci-section {margin: 2.2rem 0 .2rem;}
+.ci-section h3 {font-size: 1.3rem; font-weight: 650; margin: 0; padding: 0; color: #1a2233;}
+.ci-section p {color: #5b6578; margin: .25rem 0 0; font-size: .95rem;}
+
+/* ---- links styled as buttons ---- */
+[data-testid="stPageLink"] a {border: 1px solid #d5dde8; border-radius: 999px; padding: .15rem .9rem;
+  background: #fff;}
+[data-testid="stPageLink"] a:hover {border-color: #1b64be; background: #f2f7fd;}
+
+/* ---- footer ---- */
+.ci-footer {margin-top: 3rem; padding: 1.6rem 0 .4rem; border-top: 1px solid #e2e6ec; display: grid;
+  grid-template-columns: 2fr 1fr 1fr; gap: 1.5rem; color: #5b6578; font-size: .85rem;}
+.ci-footer b {color: #1a2233;}
+.ci-footer a {color: #5b6578; text-decoration: none; display: block; margin: .15rem 0;}
+.ci-footer a:hover {color: #1b64be;}
+@media (max-width: 760px) {.ci-footer {grid-template-columns: 1fr;} .ci-hero {padding: 1.6rem;}
+  .ci-hero h1 {font-size: 1.7rem;}}
+</style>
+"""
+
+
+def inject_css() -> None:
+    st.html(CSS)
+
+
+def page_header(eyebrow: str, title: str, subtitle: str = "", chips: list[str] | None = None,
+                small: bool = True) -> None:
+    """The coloured band at the top of every page: section label, title, purpose, data-freshness chips."""
     m = meta()
-    with st.sidebar:
-        st.markdown("**Obesity & T2D Intelligence**  \n"
-                    f"<span style='opacity:.7;font-size:.85rem'>Internal · {m['anchor_brand']} brand team</span>",
-                    unsafe_allow_html=True)
-        st.caption(f"Trials {m['landscape_snapshot']} · Brief {m['brief']} · "
-                   f"Part D {m['part_d_data_year']}")
+    chips = chips if chips is not None else [f"Trials {m['landscape_snapshot']}", f"Brief {m['brief']}",
+                                             f"Part D {m['part_d_data_year']} data"]
+    chip_html = "".join(f"<span class='ci-chip'>{c}</span>" for c in chips)
+    st.html(f"<div class='ci-hero{' small' if small else ''}'><div class='eyebrow'>{eyebrow}</div>"
+            f"<h1>{title}</h1><p>{subtitle}</p><div class='ci-chips'>{chip_html}</div></div>")
 
 
-def page_header(eyebrow: str, title: str, subtitle: str = "") -> None:
-    """Small coloured section label, the page title, and a one-line subtitle."""
-    st.markdown(f"<div style='color:#1b64be;font-weight:600;font-size:.8rem;letter-spacing:.08em;"
-                f"text-transform:uppercase;margin-bottom:-.6rem'>{eyebrow}</div>", unsafe_allow_html=True)
-    st.title(title)
-    if subtitle:
-        st.markdown(f"<div style='color:#5b6578;font-size:1.02rem;margin:-.4rem 0 .6rem'>{subtitle}</div>",
-                    unsafe_allow_html=True)
+def section(title: str, subtitle: str = "") -> None:
+    st.html(f"<div class='ci-section'><h3>{title}</h3>{f'<p>{subtitle}</p>' if subtitle else ''}</div>")
+
+
+def footer() -> None:
+    m = meta()
+    docs = REPO + "/blob/main/docs/"
+    st.html(f"""<div class='ci-footer'>
+      <div><b>Obesity &amp; T2D Intelligence</b><br>Internal tool for the {m['anchor_brand']} brand team.
+        Built from public data: ClinicalTrials.gov, openFDA, Health Canada, Ontario Drug Benefit and CMS
+        Medicare Part D. Data built {m['built_at']}.</div>
+      <div><b>Methodology</b><a href='{docs}M3_DECISIONS.md' target='_blank'>Landscape</a>
+        <a href='{docs}M4_DECISIONS.md' target='_blank'>Segmentation</a>
+        <a href='{docs}M5_DECISIONS.md' target='_blank'>Weekly brief</a></div>
+      <div><b>Project</b><a href='{REPO}' target='_blank'>Source code</a>
+        <a href='{docs}DATA_NOTES.md' target='_blank'>Data notes</a>
+        <a href='{docs}ROADMAP.md' target='_blank'>Roadmap</a></div></div>""")
 
 
 def source_note(*parts: str) -> None:

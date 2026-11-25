@@ -24,6 +24,8 @@ PAGES = {
     ],
     "Reference": [st.Page("views/about.py", title="About the data", icon=":material/info:")],
 }
-page = st.navigation(PAGES)
-C.sidebar()
+st.logo(str(C.LOGO), size="large")
+page = st.navigation(PAGES, position="top")
+C.inject_css()
 page.run()
+C.footer()

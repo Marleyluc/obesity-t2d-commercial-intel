@@ -15,7 +15,7 @@ C.source_note(f"CMS Medicare Part D prescribers, {m['part_d_data_year']} data",
 plan = m["plan_by_segment"]
 lead = [s for s in plan if s in {"Oral GLP-1 users (Rybelsus)", "Tirzepatide-led (Mounjaro)",
                                  "Injectable GLP-1 adopters (Ozempic / Trulicity)"}]
-with st.container(border=True):
+with st.container(border=True, key="card-reco"):
     st.markdown(
         f"**The recommendation.** Call **{m['in_call_plan']:,}** prescribers. Lead with those already in the "
         f"GLP-1 class ({', '.join(f'{s}: {plan[s]:,}' for s in lead)}), then the biggest-volume "
@@ -32,8 +32,7 @@ k3.metric("Already in the class (high fit)", f"{m['plan_pct_high_fit']}%",
 k4.metric("Overlap with volume-only list", f"{100 * m['overlap_with_baseline'] / m['in_call_plan']:.0f}%", border=True)
 
 # ---- targeting matrix ----
-st.subheader("The targeting matrix")
-st.caption("Rows: how much a prescriber writes (value). Columns: how close their prescribing is to an oral "
+C.section("The targeting matrix", "Rows: how much a prescriber writes (value). Columns: how close their prescribing is to an oral "
            "GLP-1 (launch fit, from their segment). Each box: prescribers, their share of all GLP-1 claims, "
            "and the tier it earns. Darker = higher priority.")
 mx = C.table("matrix")
@@ -57,15 +56,14 @@ st.caption("Tier 1: rep calls from launch, high frequency. Tier 2: rep calls in 
            "Tier 3: remote / inside sales and digital. Tier 4: non-personal only.")
 
 # ---- segment cards ----
-st.subheader("The segments")
-st.caption("Seven behaviour-based segments from k-means clustering on what each prescriber writes, "
+C.section("The segments", "Seven behaviour-based segments from k-means clustering on what each prescriber writes, "
            "plus a low-volume group. Sorted by how many names each puts in the call plan.")
 cards = C.table("segment_cards")
 FIT_BADGE = {"High": ("High launch fit", "green"), "Medium": ("Medium launch fit", "orange"),
              "Low": ("Low launch fit", "gray")}
 cols = st.columns(2)
 for i, r in enumerate(cards.itertuples()):
-    with cols[i % 2], st.container(border=True):
+    with cols[i % 2], st.container(border=True, key=f"card-seg-{i}"):
         st.markdown(f"**{r.cluster}**")
         label, colour = FIT_BADGE.get(r.launch_fit, ("Not profiled", "gray"))
         st.badge(label, color=colour)
@@ -86,7 +84,7 @@ with st.expander("What each segment prescribes (averages, %)"):
         "pct_primary_care_or_np_pa": "% primary care / NP / PA"})
 
 # ---- map ----
-st.subheader("Where the call plan lands")
+C.section("Where the call plan lands")
 measure = st.segmented_control(
     "Show", ["Names in the call plan", "% of the state's GLP-1 claims reached"],
     default="Names in the call plan")

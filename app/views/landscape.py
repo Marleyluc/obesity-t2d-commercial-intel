@@ -21,8 +21,7 @@ k3.metric("Lilly + Novo share of late-stage", f"{share['share_pct'].head(2).sum(
 k4.metric("Readouts, next 18 months", f"{len(C.table('landscape_upcoming')):,}", border=True)
 
 # ---- class x phase ----
-st.subheader("Where the pipeline is crowded")
-st.caption("Number of active trials per class and phase. Darker = more trials.")
+C.section("Where the pipeline is crowded", "Number of active trials per class and phase. Darker = more trials.")
 z = cp[phases]
 fig = go.Figure(go.Heatmap(
     z=z.values, x=phases, y=z.index, text=z.where(z > 0, "").values, texttemplate="%{text}",
@@ -37,8 +36,7 @@ with st.expander("Table view"):
 # ---- sponsors ----
 left, right = st.columns([1, 1])
 with left:
-    st.subheader("Who runs the late-stage trials")
-    st.caption("Share of active Phase 2/3 and Phase 3 trials, by lead sponsor.")
+    C.section("Who runs the late-stage trials", "Share of active Phase 2/3 and Phase 3 trials, by lead sponsor.")
     s = share.iloc[::-1]
     colors = [C.GREY if n == "(all others)" else (C.SERIES[0] if "Lilly" in n else C.SERIES[1] if "Novo" in n
               else "#6aabf1") for n in s["sponsor"]]
@@ -53,8 +51,7 @@ with left:
 
 # ---- assets ----
 with right:
-    st.subheader("Key assets")
-    st.caption("One row per tracked molecule. Next readout = earliest primary completion of its active trials.")
+    C.section("Key assets", "One row per tracked molecule. Next readout = earliest primary completion of its active trials.")
     a = C.table("landscape_assets")
     only_active = st.toggle("Only molecules with active trials", value=True)
     if only_active:
@@ -71,8 +68,7 @@ with right:
             "ca_status": "Canada", "ontario_coverage": "Ontario (ODB)"})
 
 # ---- readouts ----
-st.subheader("Upcoming readouts")
-st.caption("Active trials whose primary completion date (a proxy for when results arrive) falls in the "
+C.section("Upcoming readouts", "Active trials whose primary completion date (a proxy for when results arrive) falls in the "
            "next 18 months. Hover a dot for the trial.")
 up = C.table("landscape_upcoming").copy()
 up["class"] = up["classes"].str.split("; ").str[0]

@@ -67,3 +67,12 @@ grid-based list; 65.9% vs 54.5% are high launch fit).
 | **Every page opens with a section label, title and one-line purpose; headline numbers sit in bordered KPI cards.** | Consistent page anatomy: the reader always knows where they are and what the page answers. | None. |
 | **One Plotly template for all charts** (font, muted axes, hover style). | Charts match the app instead of Plotly's defaults. | None. |
 | **The developer "Deploy" menu is hidden from viewers** (`client.toolbarMode = "viewer"`). | Viewers of an internal tool shouldn't see developer controls. | Run locally with `--client.toolbarMode developer` if you need them. |
+
+## Website-style redesign (2026-11-25)
+
+| Decision | Why | Cost |
+|---|---|---|
+| **Top navigation bar with a logo (`app/assets/logo.svg`) and drop-down groups, instead of a sidebar.** | Reads like a web product; more room for content. | None. |
+| **A gradient header band on every page** (section label, title, purpose, data-freshness chips), a centred 1,240 px content width, and a footer with methodology and source links. | Consistent page anatomy, and the reader always sees how fresh the data is. | Custom CSS (`common.CSS`) targets Streamlit's element ids; a future Streamlit release could change them, so re-check the look after upgrading. |
+| **KPI tiles with an accent bar and soft shadow; cards (`st.container(key="card-...")`) lift on hover; links styled as pill buttons.** | Clear visual hierarchy: numbers, then cards, then detail. | None. |
+| **Stayed in Streamlit rather than rebuilding as a custom website (e.g. React).** | Same look for a fraction of the work, and the Python pipeline, tests and deployment stay as they are. | Less pixel-level control than a hand-built site. |

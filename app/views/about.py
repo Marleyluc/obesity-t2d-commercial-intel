@@ -10,7 +10,7 @@ st.markdown("Everything in this app comes from public sources, pulled and proces
             "repository. The app itself never calls an API: it reads a small export built by "
             "`scripts/build_app_data.py`.")
 
-st.subheader("Sources and freshness")
+C.section("Sources and freshness")
 st.dataframe([
     {"Source": "ClinicalTrials.gov (API v2)", "Used for": "Pipeline, phases, readout timing",
      "As of": m["landscape_snapshot"], "Refresh": "Weekly pull"},
@@ -25,7 +25,7 @@ st.dataframe([
 ], hide_index=True, width="stretch")
 st.caption(f"App data built {m['built_at']}.")
 
-st.subheader("How it works, in brief")
+C.section("How it works, in brief")
 st.markdown("""
 - **Landscape:** active, industry-sponsored Phase 1-3 trials mapped to our list of molecules and classes.
   "Next readout" is the primary completion date, a proxy: sponsors often report later.
@@ -38,7 +38,7 @@ st.markdown("""
   capacity of {cap:,} names, best tier first.
 """.replace("{cap:,}", f"{m['call_capacity']:,}"))
 
-st.subheader("Limits to keep in mind")
+C.section("Limits to keep in mind")
 st.markdown("""
 1. **Medicare Part D only**, mostly patients aged 65+. Commercial and Medicaid prescribing, where much
    new GLP-1 use is, could rank prescribers differently.
@@ -58,7 +58,7 @@ st.markdown("""
 9. **Trial dates are sponsor-reported** and often move; the change log tracks those moves.
 """)
 
-st.subheader("More detail")
+C.section("More detail")
 st.markdown("Every design decision, with its reason and its cost, is written up in the repository: "
             "`docs/M3_DECISIONS.md` (landscape), `docs/M4_DECISIONS.md` (segmentation), "
             "`docs/M5_DECISIONS.md` (brief), `docs/M6_DECISIONS.md` (this app), and `docs/DATA_NOTES.md`.")

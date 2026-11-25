@@ -25,7 +25,8 @@ def test_page_runs(page):
     at = AppTest.from_file(str(APP / "streamlit_app.py"), default_timeout=30).run()
     at.switch_page(f"views/{page}").run()
     assert not at.exception, at.exception
-    assert at.title, "every page has a title"
+    html = " ".join(str(getattr(e, "proto", "")) for e in at.main)
+    assert "ci-hero" in html, "every page opens with its header band"
     assert time.perf_counter() - start < 5
 
 

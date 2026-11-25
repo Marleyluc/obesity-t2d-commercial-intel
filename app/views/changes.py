@@ -37,7 +37,7 @@ with tab_brief:
         body = text.split("\n", 1)[1] if text.startswith("# ") else text  # the page already has a title
         body = body.replace("\n## ", "\n##### ")  # section headings sized for a panel, not a page
         body = "\n".join(ln for ln in body.splitlines() if not ln.startswith("*Obesity and T2D landscape brief"))
-        with st.container(border=True):
+        with st.container(border=True, key="card-brief"):
             st.markdown(C.link_ids(body))
         st.caption("Every [ID] links to its source record. The brief was written by an LLM that saw only "
                    "the rows below, and an automatic check rejects any brief that cites an ID not in them.")
