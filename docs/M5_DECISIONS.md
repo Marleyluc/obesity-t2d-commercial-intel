@@ -46,3 +46,22 @@ Not sent: 9 "Primary label source changed" rows, the expected one-off effect of 
 | **One retry, with the problems listed in the request; a second failure saves nothing** and writes the draft to `briefs/<date>.rejected.md`. | Most slips are fixed when the model is told exactly what was wrong. Refusing to save after that means a bad brief can't quietly go out. The rejected draft shows a human what went wrong. | A retry doubles that week's cost (both calls are counted in the token log). |
 | **The footer records the check:** how many distinct IDs were cited and whether it took a retry. | A reader can see the brief was checked, without opening the code. | None. |
 | **What the guardrail can't catch:** a wrong claim with a right ID (e.g. calling a labeling change an approval). | That needs a human or a second model reading each sentence against its row. Out of scope for M5; the input file next to each brief makes the human check quick. | Stated as a limitation in the write-up. |
+
+### No-cost route: drafts written outside the API (`--draft`)
+
+| Decision | Why | Cost |
+|---|---|---|
+| **`build_brief.py --draft <file>` takes a draft written elsewhere (for this project, by Claude in the Claude app from the same input file and the same rules) and puts it through the same guardrail.** | The API is billed per use, separately from a Claude subscription, and this is a student project. The guardrail is what makes a brief trustworthy, and it runs free. | Not automated: someone has to make the draft each week. |
+| **No retry for outside drafts:** a failing draft is rejected, and you fix or redraft it. | There is no model on the other end to retry. | None. |
+| **The footer says who wrote it** ("drafted in the Claude app, not the API"). | Honesty about how each sample brief was made. The API route stays in the code and its tests, ready for a scheduled weekly run. | None. |
+
+## First real brief (`briefs/2026-11-25.md`, 2026-11-25)
+
+Claude Opus 5.5 through the API: 1,726 tokens in, 772 out (including thinking), about 2 US cents.
+The guardrail passed on the first attempt, with 3 distinct IDs cited. A hand check of every sentence
+against `briefs/2026-11-25.input.json` found every fact correct: the three Takeda alogliptin
+labeling supplements (Nesina SUPPL-17 and Kazano SUPPL-20 on 2026-11-20, Oseni SUPPL-18 on
+2026-11-23) and the one shared FDA letter, which comes from the letter URL in each row's `detail`.
+The model also said the labels' content was not in the log, rather than guessing it.
+Weak spot: the second headline only restates that nothing else happened. That is acceptable for a
+quiet week; watch it on a busy one.

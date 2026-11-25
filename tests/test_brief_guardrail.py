@@ -107,3 +107,17 @@ def test_two_bad_drafts_save_nothing(repo):
         G.run(client=ScriptedClient(FIRST_BAD, FIRST_BAD))
     assert not (repo / "2026-11-25.md").exists()
     assert "REJECTED" in (repo / "2026-11-25.rejected.md").read_text()
+
+
+# ---- a draft written outside the API (e.g. in the Claude app) ----
+
+def test_outside_draft_is_checked_and_saved_without_any_client(repo):
+    r = G.run(draft="Here you go:\n\n" + OK)
+    assert r["model"] == G.DRAFT_AUTHOR and r["guardrail"]["attempts"] == 1
+    assert "drafted in the Claude app" in (repo / "2026-11-25.md").read_text()
+
+
+def test_bad_outside_draft_is_rejected_with_no_retry(repo):
+    with pytest.raises(G.BriefError, match="failed the ID guardrail, so"):
+        G.run(draft=FIRST_BAD)
+    assert not (repo / "2026-11-25.md").exists()

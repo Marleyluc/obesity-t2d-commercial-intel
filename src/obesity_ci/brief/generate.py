@@ -17,6 +17,10 @@ The client is passed in, so tests use a fake one and never call the API (see
 tests/test_brief_generate.py). Between generating and saving, the ID guardrail (guardrail.py,
 chunk 3) checks the draft; a failing draft gets one retry, and a second failure saves nothing as
 the brief (the draft goes to briefs/<date>.rejected.md for a human to look at).
+
+No API key? run(draft=...) takes a draft written elsewhere (e.g. by Claude in the Claude app, from
+the same input file and prompt) and puts it through the same guardrail. There is no retry: a
+failing draft is rejected and you fix or redraft it.
 """
 
 from __future__ import annotations
@@ -202,23 +206,42 @@ def guarded_call(brief_input: dict, client, anchor: dict, out: Path) -> dict:
         meta["output_tokens"] += first["output_tokens"]
         problems = guardrail.check(meta["body"], allowed, heads)
         attempts = 2
+    _keep_or_reject(meta, problems, attempts, out)
+    return meta
+
+
+DRAFT_AUTHOR = "Claude (drafted in the Claude app, not the API)"
+
+
+def _keep_or_reject(meta: dict, problems: list[str], attempts: int, out: Path) -> None:
     if problems:
         rejected = out.with_name(out.name.replace(".md", ".rejected.md"))
         rejected.write_text("<!-- REJECTED by the ID guardrail; not a brief.\n- " + "\n- ".join(problems)
                             + "\n-->\n\n" + meta["body"] + "\n", encoding="utf-8")
-        raise BriefError("The brief failed the ID guardrail twice, so it was not saved:\n- "
+        raise BriefError(f"The brief failed the ID guardrail{' twice' if attempts == 2 else ''}, so it was not saved:\n- "
                          + "\n- ".join(problems) + f"\nThe last draft is in {rejected} for review.")
     out.with_name(out.name.replace(".md", ".rejected.md")).unlink(missing_ok=True)  # stale reject
     meta["guardrail"] = {"attempts": attempts, "citations": len(guardrail.cited_ids(meta["body"]))}
+
+
+def checked_draft(brief_input: dict, draft: str, anchor: dict, out: Path) -> dict:
+    """A draft written outside the API, put through the same guardrail (no retry)."""
+    if "## " not in draft:
+        raise BriefError("The draft has no section headings, so it isn't a brief.")
+    meta = {"body": draft[draft.index("## "):].strip(), "model": DRAFT_AUTHOR}
+    problems = guardrail.check(meta["body"], inputs.allowed_ids(brief_input), headings(anchor["molecule"]))
+    _keep_or_reject(meta, problems, 1, out)
     return meta
 
 
-def run(date: str | None = None, client=None) -> dict:
+def run(date: str | None = None, client=None, draft: str | None = None) -> dict:
     src = input_path(date)
     brief_input = json.loads(src.read_text(encoding="utf-8"))
     anchor = anchor_context()
     out = src.with_name(src.name.replace(".input.json", ".md"))
-    if brief_input["changes"]:
+    if draft is not None:
+        meta = checked_draft(brief_input, draft, anchor, out)
+    elif brief_input["changes"]:
         meta = guarded_call(brief_input, client or default_client(), anchor, out)
     else:
         meta = {"body": empty_body(anchor["molecule"]), "model": None}
