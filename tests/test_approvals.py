@@ -58,3 +58,36 @@ def test_build_tables(tmp_path):
     lb = t["fda_labels"]
     primary = lb[lb["is_primary"]]
     assert list(primary["set_id"]) == ["a"]  # Lilly's label, not the repackager's higher version
+
+
+def test_unindexed_manufacturer_label_becomes_primary(tmp_path):
+    """2026-11-24: Novo's own Ozempic label had no openfda block, so only a repackager copy was
+    primary. A label without the index gets its application from Drugs@FDA, by dosage form."""
+    apps = {"results": [
+        {"application_number": "NDA209637", "sponsor_name": "NOVO",
+         "products": [product("OZEMPIC", ["SEMAGLUTIDE"], "SUBCUTANEOUS")], "submissions": [sub("ORIG", "1", "AP", "20171205")]},
+        {"application_number": "NDA213051", "sponsor_name": "NOVO",
+         "products": [product("OZEMPIC", ["SEMAGLUTIDE"], "ORAL"), product("RYBELSUS", ["SEMAGLUTIDE"], "ORAL")],
+         "submissions": [sub("ORIG", "1", "AP", "20190920")]}]}
+    labels = {"results": [
+        {"set_id": "repack", "version": "6", "effective_time": "20231117",
+         "openfda": {"brand_name": ["OZEMPIC"], "application_number": ["NDA209637"],
+                     "manufacturer_name": ["A-S Medication Solutions"]}},
+        {"set_id": "novo", "version": "30", "effective_time": "20260901",   # no openfda block
+         "spl_product_data_elements": ["Ozempic semaglutide injection SEMAGLUTIDE"],
+         "description": ["OZEMPIC (semaglutide) injection, for subcutaneous use"]},
+        {"set_id": "novo-tabs", "version": "3", "effective_time": "20260901",
+         "spl_product_data_elements": ["Ozempic semaglutide tablet SEMAGLUTIDE"],
+         "dosage_forms_and_strengths": ["Tablets: 1.5 mg, 4 mg, 9 mg"]},
+        {"set_id": "repack2", "version": "50", "effective_time": "20260901",  # no openfda, repackager panel
+         "spl_product_data_elements": ["Ozempic semaglutide injection"],
+         "package_label_principal_display_panel": ["Ozempic ... Repackaged by Proficient Rx LP"]}]}
+    (tmp_path / "approvals__semaglutide.json").write_text(json.dumps(apps))
+    (tmp_path / "label__ozempic.json").write_text(json.dumps(labels))
+    (tmp_path / "manifest.json").write_text("{}")
+    lb = A.build(tmp_path)["fda_labels"].set_index("set_id")
+    assert lb.loc["novo", "application_number"] == "NDA209637" and lb.loc["novo", "manufacturer"] == "NOVO"
+    assert lb.loc["novo-tabs", "application_number"] == "NDA213051"  # tablets -> oral application
+    assert lb.loc["novo", "manufacturer_source"] == "Drugs@FDA (label not indexed)"
+    assert bool(lb.loc["repack2", "is_repackager"])
+    assert set(lb.index[lb["is_primary"]]) == {"novo", "novo-tabs"}

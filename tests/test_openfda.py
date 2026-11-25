@@ -47,3 +47,9 @@ def test_pull_saves_files(tmp_path, monkeypatch):
     monkeypatch.setitem(config.settings()["paths"], "raw", str(tmp_path))
     result = openfda.pull(only="retatrutide", session=FakeSession())
     assert result["files"][0]["n_results"] == 0
+
+
+def test_label_search_also_reads_the_labels_own_product_text():
+    q = openfda.label_search("Ozempic")
+    assert 'openfda.brand_name:"Ozempic"' in q and 'spl_product_data_elements:"Ozempic"' in q
+    assert " AND " not in q  # spaces = OR

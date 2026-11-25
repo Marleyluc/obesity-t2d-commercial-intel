@@ -89,3 +89,20 @@ def test_incomplete_snapshots_are_ignored(tmp_path, monkeypatch):
     (tmp_path / "ctgov" / "2026-11-24" / "manifest.json").write_text("{}")
     (tmp_path / "ctgov" / "2026-11-25").mkdir()  # interrupted pull: no manifest
     assert [p.name for p in snapshots.list_snapshots("ctgov")] == ["2026-11-24"]
+
+
+def test_new_primary_label_document_is_not_a_label_update():
+    """After the label search fix, Novo's own label replaces a repackager copy: report it as a
+    low 'Primary label source changed', not as Novo updating its label."""
+    lab = lambda sid, v, maker: pd.DataFrame([{"brand_query": "ozempic", "application_number": "NDA209637",
+                                               "is_primary": True, "set_id": sid, "version": v, "manufacturer": maker,
+                                               "effective_date": T("2026-09-01"), "indications": "x",
+                                               "recent_major_changes": ""}])
+    empty_apps = pd.DataFrame(columns=["application_number", "app_type", "molecules", "brands", "sponsor",
+                                       "marketing_status"])
+    empty_ev = pd.DataFrame(columns=["application_number", "submission", "event_type", "date", "letter_url"])
+    old = {"fda_applications": empty_apps, "fda_events": empty_ev, "fda_labels": lab("repack", 6, "A-S Medication")}
+    new = {"fda_applications": empty_apps, "fda_events": empty_ev, "fda_labels": lab("novo", 30, "NOVO")}
+    log = C.change_log(C.fda_changes(old, new), "a", "b")
+    assert list(log["change_type"]) == ["Primary label source changed"]
+    assert log["importance"].iloc[0] == "low" and "NOVO" in log["detail"].iloc[0]

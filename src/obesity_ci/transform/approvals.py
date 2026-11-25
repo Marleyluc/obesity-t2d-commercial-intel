@@ -27,6 +27,7 @@ from pathlib import Path
 import pandas as pd
 
 from obesity_ci import config, snapshots
+from obesity_ci.sources.ctgov import slug
 from obesity_ci.transform.trials import parts_of, term_pattern
 
 SOURCE = "openfda"
@@ -111,15 +112,65 @@ def _first(lst):
     return lst[0] if isinstance(lst, list) and lst else None
 
 
-def label_rows(labels: list[tuple[str, dict]]) -> pd.DataFrame:
+def brand_applications(apps: dict[str, dict]) -> dict[str, dict[str, dict]]:
+    """brand slug -> {application number: {sponsor, oral, n_rx}} for branded (non-ANDA) applications.
+
+    One brand can sit on several applications (2026-11-24: Ozempic injection NDA209637 and
+    Ozempic tablets NDA213051; Wegovy injection and tablets; two Levemir BLAs).
+    """
+    out: dict[str, dict[str, dict]] = {}
+    for num, a in apps.items():
+        if num.startswith("ANDA"):
+            continue
+        for p in a.get("products", []) or []:
+            if not p.get("brand_name"):
+                continue
+            e = out.setdefault(slug(p["brand_name"]), {}).setdefault(
+                num, {"sponsor": a.get("sponsor_name"), "oral": False, "n_rx": 0})
+            e["oral"] |= "ORAL" in (p.get("route") or "").upper()
+            e["n_rx"] += p.get("marketing_status") == "Prescription"
+    return out
+
+
+def guess_application(label: dict, known: dict[str, dict]) -> str | None:
+    """For a label with no openFDA index: pick the brand's application by dosage form
+    (more "tablet" than "inject" wording = oral application), then the one with most marketed products, then lowest number."""
+    if not known:
+        return None
+    text = " ".join(" ".join(label.get(f) or []) for f in
+                    ("spl_product_data_elements", "dosage_forms_and_strengths", "description",
+                     "package_label_principal_display_panel"))
+    oral = len(re.findall(r"\btablets?\b", text, flags=re.I)) > len(re.findall(r"\binject", text, flags=re.I))
+    cands = [n for n, e in known.items() if e["oral"] == oral] or list(known)
+    return sorted(cands, key=lambda n: (-known[n]["n_rx"], n))[0]
+
+
+def label_rows(labels: list[tuple[str, dict]], apps: dict[str, dict] | None = None) -> pd.DataFrame:
+    by_brand = brand_applications(apps or {})
     rows = []
     for brand_query, r in labels:
-        o = r.get("openfda", {})
+        o = r.get("openfda") or {}
+        known = by_brand.get(brand_query, {})
+        app, maker, source = _first(o.get("application_number")), _first(o.get("manufacturer_name")), "openFDA index"
+        if not o:
+            # Label not in openFDA's harmonised index: take the application from Drugs@FDA
+            # (see guess_application) and its sponsor as the manufacturer. Repackagers are
+            # still caught from the label's own package panel text.
+            source = "Drugs@FDA (label not indexed)"
+            app = guess_application(r, known)
+            maker = known[app]["sponsor"] if app else None
+            panel = " ".join(r.get("package_label_principal_display_panel") or [])
+            if re.search(REPACKAGERS, panel, flags=re.I):
+                maker = f"repackager (from package text): {maker or ''}".strip()
         rows.append({
             "brand_query": brand_query,
             "brand_names": "; ".join(o.get("brand_name", [])),
-            "application_number": _first(o.get("application_number")),
-            "manufacturer": _first(o.get("manufacturer_name")),
+            "application_number": app,
+            "manufacturer": maker,
+            "manufacturer_source": source,
+            # A label found under one brand but filed under another brand's application
+            # (e.g. a Rybelsus label that also lists Ozempic) can't be that brand's primary label.
+            "app_matches_brand": (not known) or app in known,
             "set_id": r.get("set_id"),
             "version": int(r["version"]) if str(r.get("version", "")).isdigit() else None,
             "effective_date": fda_date(r.get("effective_time")),
@@ -131,13 +182,18 @@ def label_rows(labels: list[tuple[str, dict]]) -> pd.DataFrame:
     if df.empty:
         return df
     # Repackagers (pharmacies, distributors) publish copies of a label under their own
-    # set_id. The primary label is the highest-version label from a non-repackager, per
+    # set_id. The primary label is the most recent label from a non-repackager, per
     # (brand, application). If only repackager copies came back, we keep the best one but
     # flag it: the manufacturer's own label is then missing from our pull.
+    # A label from a repackager or under another brand's application is never primary unless nothing
+    # better exists for that (brand, application); labels with no application at all are never primary.
     df["is_repackager"] = df["manufacturer"].fillna("").str.contains(REPACKAGERS, case=False, regex=True)
-    df = df.sort_values(["brand_query", "application_number", "is_repackager", "version", "effective_date"],
+    # Newest effective date first: version numbers only count within one document (set_id), and
+    # Novo keeps several Levemir documents (a 2022 one at version 30, a 2026 one at version 26).
+    df = df.sort_values(["brand_query", "application_number", "is_repackager", "effective_date", "version"],
                         ascending=[True, True, True, False, False])
-    df["is_primary"] = ~df.duplicated(["brand_query", "application_number"])
+    df["is_primary"] = (~df.duplicated(["brand_query", "application_number"]) & df["app_matches_brand"]
+                        & df["application_number"].notna())
     return df.reset_index(drop=True)
 
 
@@ -193,7 +249,7 @@ def build(folder: Path, mols: pd.DataFrame | None = None) -> dict[str, pd.DataFr
         "fda_app_molecules": pd.DataFrame(links, columns=["application_number", "generic", "class_id"]),
         "fda_events": pd.DataFrame(events).sort_values(["date", "application_number"],
                                                        ascending=[False, True]).reset_index(drop=True),
-        "fda_labels": label_rows(labels),
+        "fda_labels": label_rows(labels, apps),
     }
 
 

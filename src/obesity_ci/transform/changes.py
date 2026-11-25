@@ -13,6 +13,7 @@ Compares the tidy tables of an OLD and a NEW snapshot and emits one row per chan
   openfda   New FDA action              original / tentative approval, efficacy supplement, ...
   openfda   Marketing status change     Prescription -> Discontinued
   openfda   Label updated               new version of a brand's primary label
+  openfda   Primary label source changed  a different document became the primary label (low)
   canada    New Canadian product / Canadian status change
   canada    Ontario listing change      new listing, or coverage changed
 
@@ -144,7 +145,13 @@ def fda_changes(old: dict[str, pd.DataFrame], new: dict[str, pd.DataFrame]) -> l
     if len(nl):
         for k in nl.index.intersection(ol.index):
             a, b = ol.loc[k], nl.loc[k]
-            if a["version"] != b["version"] or not _same(a["effective_date"], b["effective_date"]):
+            if a.get("set_id") != b.get("set_id"):
+                # A different document is now the primary label (e.g. the manufacturer's own label
+                # replaced a repackager copy after a search fix): not a label change by the company.
+                rows.append(_row("openfda", "Primary label source changed", "low", k[1], "", k[0],
+                                 "label set_id", a.get("set_id"), b.get("set_id"),
+                                 f"Now from {b.get('manufacturer') or 'unknown'}; compare label versions by hand."))
+            elif a["version"] != b["version"] or not _same(a["effective_date"], b["effective_date"]):
                 changed = "" if (a["recent_major_changes"] or "") == (b["recent_major_changes"] or "") \
                     else f"Recent major changes now: {(b['recent_major_changes'] or '')[:300]}"
                 indic = "Indications text changed. " if (a["indications"] or "") != (b["indications"] or "") else ""

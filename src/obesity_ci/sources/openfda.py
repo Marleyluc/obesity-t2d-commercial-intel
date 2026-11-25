@@ -47,7 +47,13 @@ def approvals_search(row) -> str:
 
 
 def label_search(brand: str) -> str:
-    return f'openfda.brand_name:"{brand}"'
+    """Search string for drug/label: the harmonised brand field OR the label's own product text.
+
+    Some labels have no `openfda` block at all (2026-11-24 pull: Novo's own Ozempic, Wegovy
+    and Levemir labels were missing, only repackager copies came back). `spl_product_data_elements`
+    is part of every label itself and starts with the brand name, so it finds those too.
+    """
+    return f'openfda.brand_name:"{brand}" spl_product_data_elements:"{brand}"'
 
 
 def build_queries() -> list[dict]:
