@@ -76,3 +76,12 @@ grid-based list; 65.9% vs 54.5% are high launch fit).
 | **A gradient header band on every page** (section label, title, purpose, data-freshness chips), a centred 1,240 px content width, and a footer with methodology and source links. | Consistent page anatomy, and the reader always sees how fresh the data is. | Custom CSS (`common.CSS`) targets Streamlit's element ids; a future Streamlit release could change them, so re-check the look after upgrading. |
 | **KPI tiles with an accent bar and soft shadow; cards (`st.container(key="card-...")`) lift on hover; links styled as pill buttons.** | Clear visual hierarchy: numbers, then cards, then detail. | None. |
 | **Stayed in Streamlit rather than rebuilding as a custom website (e.g. React).** | Same look for a fraction of the work, and the Python pipeline, tests and deployment stay as they are. | Less pixel-level control than a hand-built site. |
+
+## Product-page pass, Apple-style (2026-11-25)
+
+| Decision | Why | Cost |
+|---|---|---|
+| **The home page is a landing page:** a black hero with slowly drifting colour light and a two-line headline, numbers that count up, a scrolling ticker of this week's market changes, and a "bento" grid of tiles (pipeline bars, call-plan comparison, brief headlines, readouts, call-plan mix by segment). | The first screen answers "what is this and why should I care" in five seconds, like a product page. | The tiles are HTML built in `views/home.py`; their numbers come from `app/data/`, so they update with each build. |
+| **Motion is pure CSS, no JavaScript:** load animations (fade up), scroll-driven reveals (`animation-timeline: view()`), bars that grow into view, a scroll-progress line under the nav, count-up numbers (`@property`). | Streamlit's `st.html` does not run scripts; CSS animation is also smoother and cheaper. | Browsers without scroll-driven animations (e.g. older Firefox) show everything without the scroll effects. Everything switches off when the viewer's system asks for reduced motion. |
+| **System font (San Francisco on a Mac), tight headline tracking, Apple's greys and blue (`#0071e3`), frosted nav, tabs as a segmented control.** | The look the brief asked for. Chart colours stay on the validated colour-blind-safe palette. | Non-Mac viewers get Inter or Helvetica instead of San Francisco. |
+| **Housekeeping rows are left out of the home-page ticker.** | Same rule as the brief: pipeline housekeeping is held for a human check, not shown as news. | None. |
